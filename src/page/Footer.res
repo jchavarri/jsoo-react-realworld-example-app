@@ -1,7 +1,7 @@
 @react.component
 let make = () => <>
   <a
-    href="https://github.com/jihchi/rescript-react-realworld-example-app"
+    href="https://github.com/jihchi/jsoo-react-realworld-example-app"
     target="_blank"
     style={ReactDOM.Style.make(
       ~position="fixed",

@@ -1,0 +1,20 @@
+(executables
+ (names main)
+ (modes js)
+ (libraries js_of_ocaml jsoo-react.lib)
+ (js_of_ocaml (javascript_files react-requires.js))
+ (preprocess (pps js_of_ocaml-ppx jsoo-react.ppx)))
+
+(rule
+ (targets shape_j.ml shape_j.mli)
+ (deps shape.atd)
+ (action (run atdgen -j -j-std %{deps})))
+
+(rule
+ (targets shape_t.ml shape_t.mli)
+ (deps shape.atd)
+ (action (run atdgen -t %{deps})))
+
+(alias
+ (name default)
+ (deps main.js))

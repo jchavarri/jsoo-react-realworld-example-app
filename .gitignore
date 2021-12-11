@@ -10,3 +10,7 @@ dist-ssr
 /lib/
 *.bs.js
 
+_opam/
+_build/
+.vscode/
+build/

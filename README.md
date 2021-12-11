@@ -1,12 +1,12 @@
 # ![RealWorld Example App](logo.png)
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/jihchi/rescript-react-realworld-example-app)
-![GitHub last commit](https://img.shields.io/github/last-commit/jihchi/rescript-react-realworld-example-app)
-![GitHub](https://img.shields.io/github/license/jihchi/rescript-react-realworld-example-app)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/jihchi/jsoo-react-realworld-example-app)
+![GitHub last commit](https://img.shields.io/github/last-commit/jihchi/jsoo-react-realworld-example-app)
+![GitHub](https://img.shields.io/github/license/jihchi/jsoo-react-realworld-example-app)
 
 > ### ReScript + React codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
-### [Demo](https://rescript-react-realworld-example-app.vercel.app)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
+### [Demo](https://jsoo-react-realworld-example-app.vercel.app)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
 
 This codebase was created to demonstrate a fully fledged fullstack application built with **[ReScript & React](https://rescript-lang.org/docs/react/latest/introduction)** including CRUD operations, authentication, routing, pagination, and more.
 
@@ -24,13 +24,13 @@ Basically its just like React single-page-application but written in [ReScript](
 
 # Getting started
 
-You can view a live demo over at https://rescript-react-realworld-example-app.vercel.app
+You can view a live demo over at https://jsoo-react-realworld-example-app.vercel.app
 
 To get the frontend running locally:
 
 ```bash
-git clone https://github.com/jihchi/rescript-react-realworld-example-app.git
-cd rescript-react-realworld-example-app
+git clone https://github.com/jihchi/jsoo-react-realworld-example-app.git
+cd jsoo-react-realworld-example-app
 npm install
 npm start
 ```
