@@ -1,7 +1,0 @@
-type user = {
-  email : string;
-  username : string;
-  bio : string nullable;
-  image : string nullable;
-  token : string;
-}

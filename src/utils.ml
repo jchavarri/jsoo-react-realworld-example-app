@@ -79,11 +79,7 @@ let formatDate : Js.date Js.t -> string =
 module Timestamp_str = struct
   type t = Js.date Js.t
 
-  let wrap x = new%js Js.date_fromTimeValue (Js.date##parse (Js.string x))
-
   let of_jsobject x = Ok (new%js Js.date_fromTimeValue (Js.date##parse x))
 
   let jsobject_of (x : Js.date Js.t) = x##toISOString
-
-  let unwrap (x : Js.date Js.t) = x##toISOString |> Js.to_string
 end

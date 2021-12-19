@@ -2,9 +2,9 @@ open Js_of_ocaml
 
 module Action = struct
   type article =
-    | Create of Shape_t.article
+    | Create of Shape.article
     | Read of string
-    | Update of string * Shape_t.article
+    | Update of string * Shape.article
     | Delete of string
 
   type follow = Follow of string | Unfollow of string
