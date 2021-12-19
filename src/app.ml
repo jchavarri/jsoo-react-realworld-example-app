@@ -1,5 +1,5 @@
 let authenticated :
-    (Shape_t.user -> React.element) -> Shape_t.user option -> React.element =
+    (Shape.user -> React.element) -> Shape.user option -> React.element =
  fun getPage user ->
   match user with
   | Some s ->

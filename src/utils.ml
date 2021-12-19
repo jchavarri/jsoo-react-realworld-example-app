@@ -75,3 +75,15 @@ let formatDate : Js.date Js.t -> string =
   let mm = string_of_int date##getMonth in
   let dd = string_of_int date##getDate in
   yyyy ^ "/" ^ mm ^ "/" ^ dd
+
+module Timestamp_str = struct
+  type t = Js.date Js.t
+
+  let wrap x = new%js Js.date_fromTimeValue (Js.date##parse (Js.string x))
+
+  let of_jsobject x = Ok (new%js Js.date_fromTimeValue (Js.date##parse x))
+
+  let jsobject_of (x : Js.date Js.t) = x##toISOString
+
+  let unwrap (x : Js.date Js.t) = x##toISOString |> Js.to_string
+end

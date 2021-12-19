@@ -6,7 +6,7 @@ let%component make ~user =
     | Some user ->
         user
     | None ->
-        {Shape_t.email= ""; username= ""; bio= None; image= None; token= ""}
+        {Shape.email= ""; username= ""; bio= None; image= None; token= ""}
   in
   nav ~className:"navbar navbar-light"
     ~children:

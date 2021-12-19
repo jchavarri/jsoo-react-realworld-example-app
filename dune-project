@@ -26,8 +26,9 @@
   ;; Web toolkit
   (js_of_ocaml (and (>= 3.8.0) (< 3.11.0)))
   (js_of_ocaml-ppx (and (>= 3.8.0) (< 3.11.0)))
+  (promise_jsoo (and (>= 0.3.1) (< 0.4.0)))
+  (ppx_jsobject_conv :dev)
   (jsoo-react :dev)
-  (atdgen (and (>= 2.2.1) (< 2.3.0)))
 
   ;; Dev dependencies
   (ocaml-lsp-server :dev)

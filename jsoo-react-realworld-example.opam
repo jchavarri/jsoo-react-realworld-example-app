@@ -12,8 +12,9 @@ depends: [
   "ocaml" {>= "4.10.0"}
   "js_of_ocaml" {>= "3.8.0" & < "3.11.0"}
   "js_of_ocaml-ppx" {>= "3.8.0" & < "3.11.0"}
+  "promise_jsoo" {>= "0.3.1" & < "0.4.0"}
+  "ppx_jsobject_conv" {dev}
   "jsoo-react" {dev}
-  "atdgen" {>= "2.2.1" & < "2.3.0"}
   "ocaml-lsp-server" {dev}
   "odoc" {with-doc}
 ]
@@ -33,5 +34,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/ml-in-barcelona/jsoo-react-template.git"
 pin-depends: [
-  [ "jsoo-react.dev" "git+https://github.com/ml-in-barcelona/jsoo-react.git#724f65e" ]
+  [ "jsoo-react.dev" "git+https://github.com/ml-in-barcelona/jsoo-react.git#426aac3" ]
+  [ "ppx_jsobject_conv.dev" "git+https://github.com/jchavarri/ppx_jsobject_conv.git#951f9a8" ]
 ]
