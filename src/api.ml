@@ -7,20 +7,24 @@ module Action = struct
     | Update of string * Shape.article
     | Delete of string
 
-  type follow = Follow of string | Unfollow of string
+  type follow =
+    | Follow of string
+    | Unfollow of string
 
-  type favorite = Favorite of string | Unfavorite of string
+  type favorite =
+    | Favorite of string
+    | Unfavorite of string
 end
 
 module Headers = struct
   let add_jwt_token : unit -> (string * string) list =
    fun () ->
     Option.bind (Utils.getCookie "jwtToken") snd
-    |> Option.map (fun token -> [("Authorization", "Token " ^ token)])
+    |> Option.map (fun token -> [ "Authorization", "Token " ^ token ])
     |> Option.value ~default:[]
 
-  let addContentTypeAsJson : unit -> (string * string) array =
-   fun () -> [|("Content-Type", "application/json; charset=UTF-8")|]
+  let add_content_type_as_json : unit -> (string * string) array =
+   fun () -> [| "Content-Type", "application/json; charset=UTF-8" |]
 end
 
 (*
@@ -39,32 +43,28 @@ end
                  AppError.fetch (status, statusText, bodyJson)
                  |> Belt.Result.Error |> resolve )
 *)
-let getErrorBodyText :
-       ('a Js.t, Fetch.Response.t Js.t) result
-    -> ('a Js.t, App_error.t) result Promise.t =
+let getErrorBodyText : ('a Js.t, Fetch.Response.t Js.t) result -> ('a Js.t, App_error.t) result Promise.t =
  fun x ->
   let open Promise in
   match x with
-  | Ok _json as ok ->
-      ok |> resolve
+  | Ok _json as ok -> ok |> resolve
   | Error resp ->
-      let status = Fetch.Response.status resp in
-      let statusText = Fetch.Response.statusText resp in
-      let bodyText = `text "FIXME: show body text instead" in
-      Error (App_error.fetch (status, statusText, bodyText)) |> resolve
+    let status = Fetch.Response.status resp in
+    let statusText = Fetch.Response.statusText resp in
+    let bodyText = `text "FIXME: show body text instead" in
+    Error (App_error.fetch (status, statusText, bodyText)) |> resolve
 
-let parseJsonIfOk :
-    Fetch.Response.t Js.t -> ('a Js.t, Fetch.Response.t Js.t) result Promise.t =
+let parseJsonIfOk : Fetch.Response.t Js.t -> ('a Js.t, Fetch.Response.t Js.t) result Promise.t =
  fun resp ->
   let open Promise in
   let open Fetch.Response in
   match ok resp with
   | true ->
-      resp |> json
-      |> then_ ~fulfilled:(fun json -> resolve (Ok json))
-      |> catch ~rejected:(fun _error -> Error resp |> resolve)
-  | false ->
-      Error resp |> resolve
+    resp
+    |> json
+    |> then_ ~fulfilled:(fun json -> resolve (Ok json))
+    |> catch ~rejected:(fun _error -> Error resp |> resolve)
+  | false -> Error resp |> resolve
 
 (*
    let article :
@@ -101,7 +101,7 @@ let parseJsonIfOk :
      let headers =
        ( match action with
        | Create _ | Update _ ->
-           Headers.addContentTypeAsJson ()
+           Headers.add_content_type_as_json ()
        | Read _ | Delete _ ->
            [||] )
        |> Belt.Array.concat (Headers.addJwtToken ())
@@ -223,9 +223,8 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
   |> then_ ~fulfilled:parseJsonIfOk
   |> then_ ~fulfilled:getErrorBodyText
   |> then_ ~fulfilled:(fun result ->
-         Stdlib.Result.bind result (fun json ->
-             json |> Shape.user_of_jsobject |> App_error.decode )
-         |> resolve )
+       Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
+     )
 (*
    let updateUser :
           user:Shape.User.t
@@ -249,7 +248,7 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
        RequestInit.make ~method_:Put
          ~headers:
            ( Headers.addJwtToken ()
-           |> Belt.Array.concat (Headers.addContentTypeAsJson ())
+           |> Belt.Array.concat (Headers.add_content_type_as_json ())
            |> HeadersInit.makeWithArray )
          ~body ()
      in
@@ -348,7 +347,7 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
        RequestInit.make ~method_:Post
          ~headers:
            ( Headers.addJwtToken ()
-           |> Belt.Array.concat (Headers.addContentTypeAsJson ())
+           |> Belt.Array.concat (Headers.add_content_type_as_json ())
            |> HeadersInit.makeWithArray )
          ~body ()
      in
@@ -402,7 +401,7 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
      in
      let requestInit =
        RequestInit.make ~method_:Post
-         ~headers:(Headers.addContentTypeAsJson () |> HeadersInit.makeWithArray)
+         ~headers:(Headers.add_content_type_as_json () |> HeadersInit.makeWithArray)
          ~body ()
      in
      Endpoints.Users.login
@@ -433,7 +432,7 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
      in
      let requestInit =
        RequestInit.make ~method_:Post
-         ~headers:(Headers.addContentTypeAsJson () |> HeadersInit.makeWithArray)
+         ~headers:(Headers.add_content_type_as_json () |> HeadersInit.makeWithArray)
          ~body ()
      in
      Endpoints.Users.root

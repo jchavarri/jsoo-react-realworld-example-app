@@ -1,38 +1,22 @@
-let backend : string = Js_of_ocaml.Js.Unsafe.global##.app##.backend
+let backend : string =
+  let open Js_of_ocaml.Js in
+  to_string Unsafe.global##.app##.backend
 
 module Articles = struct
-  let root :
-         ?limit:int
-      -> ?offset:int
-      -> ?tag:string
-      -> ?author:string
-      -> ?favorited:string
-      -> unit
-      -> string =
+  let root : ?limit:int -> ?offset:int -> ?tag:string -> ?author:string -> ?favorited:string -> unit -> string =
    fun ?(limit = 10) ?(offset = 0) ?tag ?author ?favorited () ->
     let limit = string_of_int limit in
     let offset = string_of_int offset in
-    let tag =
-      tag |> Option.map (fun tag' -> "&tag=" ^ tag') |> Option.value ~default:""
-    in
-    let author =
-      author
-      |> Option.map (fun author' -> "&author=" ^ author')
-      |> Option.value ~default:""
-    in
+    let tag = tag |> Option.map (fun tag' -> "&tag=" ^ tag') |> Option.value ~default:"" in
+    let author = author |> Option.map (fun author' -> "&author=" ^ author') |> Option.value ~default:"" in
     let favorited =
-      favorited
-      |> Option.map (fun favorited' -> "&favorited=" ^ favorited')
-      |> Option.value ~default:""
+      favorited |> Option.map (fun favorited' -> "&favorited=" ^ favorited') |> Option.value ~default:""
     in
-    backend ^ "/api/articles?limit=" ^ limit ^ "&offset=" ^ offset ^ tag
-    ^ author ^ favorited
+    backend ^ "/api/articles?limit=" ^ limit ^ "&offset=" ^ offset ^ tag ^ author ^ favorited
 
-  let article : slug:string -> unit -> string =
-   fun ~slug () -> backend ^ "/api/articles/" ^ slug
+  let article : slug:string -> unit -> string = fun ~slug () -> backend ^ "/api/articles/" ^ slug
 
-  let favorite : slug:string -> unit -> string =
-   fun ~slug () -> backend ^ "/api/articles/" ^ slug ^ "/favorite"
+  let favorite : slug:string -> unit -> string = fun ~slug () -> backend ^ "/api/articles/" ^ slug ^ "/favorite"
 
   let feed : ?limit:int -> ?offset:int -> unit -> string =
    fun ?(limit = 10) ?(offset = 0) () ->
@@ -50,11 +34,9 @@ module Articles = struct
 end
 
 module Profiles = struct
-  let profile : username:string -> unit -> string =
-   fun ~username () -> backend ^ "/api/profiles/" ^ username
+  let profile : username:string -> unit -> string = fun ~username () -> backend ^ "/api/profiles/" ^ username
 
-  let follow : username:string -> unit -> string =
-   fun ~username () -> backend ^ "/api/profiles/" ^ username ^ "/follow"
+  let follow : username:string -> unit -> string = fun ~username () -> backend ^ "/api/profiles/" ^ username ^ "/follow"
 end
 
 module Users = struct

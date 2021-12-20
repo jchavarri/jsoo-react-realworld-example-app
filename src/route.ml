@@ -14,21 +14,12 @@ let useRoute : unit -> t =
   let url = React.Router.useUrl () in
   let hash = url.hash |> String.split_on_char '/' in
   match hash with
-  | [""; "settings"] ->
-      Settings
-  | [""; "login"] ->
-      Login
-  | [""; "register"] ->
-      Register
-  | [""; "editor"] ->
-      CreateArticle
-  | [""; "editor"; slug] ->
-      EditArticle slug
-  | [""; "article"; slug] ->
-      Article slug
-  | [""; "profile"; username] ->
-      Profile username
-  | [""; "profile"; username; "favorites"] ->
-      Favorited username
-  | _ ->
-      Home
+  | [ ""; "settings" ] -> Settings
+  | [ ""; "login" ] -> Login
+  | [ ""; "register" ] -> Register
+  | [ ""; "editor" ] -> CreateArticle
+  | [ ""; "editor"; slug ] -> EditArticle slug
+  | [ ""; "article"; slug ] -> Article slug
+  | [ ""; "profile"; username ] -> Profile username
+  | [ ""; "profile"; username; "favorites" ] -> Favorited username
+  | _ -> Home

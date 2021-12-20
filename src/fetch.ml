@@ -32,49 +32,29 @@ type request_method =
 
 let encode_request_method = (* internal *)
   function
-  | Get ->
-      "GET"
-  | Head ->
-      "HEAD"
-  | Post ->
-      "POST"
-  | Put ->
-      "PUT"
-  | Delete ->
-      "DELETE"
-  | Connect ->
-      "CONNECT"
-  | Options ->
-      "OPTIONS"
-  | Trace ->
-      "TRACE"
-  | Patch ->
-      "PATCH"
-  | Other method_ ->
-      method_
+  | Get -> "GET"
+  | Head -> "HEAD"
+  | Post -> "POST"
+  | Put -> "PUT"
+  | Delete -> "DELETE"
+  | Connect -> "CONNECT"
+  | Options -> "OPTIONS"
+  | Trace -> "TRACE"
+  | Patch -> "PATCH"
+  | Other method_ -> method_
 
 let decode_request_method = (* internal *)
   function
-  | "GET" ->
-      Get
-  | "HEAD" ->
-      Head
-  | "POST" ->
-      Post
-  | "PUT" ->
-      Put
-  | "DELETE" ->
-      Delete
-  | "CONNECT" ->
-      Connect
-  | "OPTIONS" ->
-      Options
-  | "TRACE" ->
-      Trace
-  | "PATCH" ->
-      Patch
-  | method_ ->
-      Other method_
+  | "GET" -> Get
+  | "HEAD" -> Head
+  | "POST" -> Post
+  | "PUT" -> Put
+  | "DELETE" -> Delete
+  | "CONNECT" -> Connect
+  | "OPTIONS" -> Options
+  | "TRACE" -> Trace
+  | "PATCH" -> Patch
+  | method_ -> Other method_
 
 type referrer_policy =
   | None
@@ -89,47 +69,28 @@ type referrer_policy =
 
 let encode_referrer_policy = (* internal *)
   function
-  | NoReferrer ->
-      "no-referrer"
-  | None ->
-      ""
-  | NoReferrerWhenDowngrade ->
-      "no-referrer-when-downgrade"
-  | SameOrigin ->
-      "same-origin"
-  | Origin ->
-      "origin"
-  | StrictOrigin ->
-      "strict-origin"
-  | OriginWhenCrossOrigin ->
-      "origin-when-cross-origin"
-  | StrictOriginWhenCrossOrigin ->
-      "strict-origin-when-cross-origin"
-  | UnsafeUrl ->
-      "unsafe-url"
+  | NoReferrer -> "no-referrer"
+  | None -> ""
+  | NoReferrerWhenDowngrade -> "no-referrer-when-downgrade"
+  | SameOrigin -> "same-origin"
+  | Origin -> "origin"
+  | StrictOrigin -> "strict-origin"
+  | OriginWhenCrossOrigin -> "origin-when-cross-origin"
+  | StrictOriginWhenCrossOrigin -> "strict-origin-when-cross-origin"
+  | UnsafeUrl -> "unsafe-url"
 
 let decode_referrer_policy = (* internal *)
   function
-  | "no-referrer" ->
-      NoReferrer
-  | "" ->
-      None
-  | "no-referrer-when-downgrade" ->
-      NoReferrerWhenDowngrade
-  | "same-origin" ->
-      SameOrigin
-  | "origin" ->
-      Origin
-  | "strict-origin" ->
-      StrictOrigin
-  | "origin-when-cross-origin" ->
-      OriginWhenCrossOrigin
-  | "strict-origin-when-cross-origin" ->
-      StrictOriginWhenCrossOrigin
-  | "unsafe-url" ->
-      UnsafeUrl
-  | e ->
-      raise (Failure ("Unknown referrerPolicy: " ^ e))
+  | "no-referrer" -> NoReferrer
+  | "" -> None
+  | "no-referrer-when-downgrade" -> NoReferrerWhenDowngrade
+  | "same-origin" -> SameOrigin
+  | "origin" -> Origin
+  | "strict-origin" -> StrictOrigin
+  | "origin-when-cross-origin" -> OriginWhenCrossOrigin
+  | "strict-origin-when-cross-origin" -> StrictOriginWhenCrossOrigin
+  | "unsafe-url" -> UnsafeUrl
+  | e -> raise (Failure ("Unknown referrerPolicy: " ^ e))
 
 type request_type =
   | None (* default? unknown? just empty string in spec *)
@@ -143,24 +104,15 @@ type request_type =
 
 let decode_request_type = (* internal *)
   function
-  | "audio" ->
-      Audio
-  | "" ->
-      None
-  | "font" ->
-      Font
-  | "image" ->
-      Image
-  | "script" ->
-      Script
-  | "style" ->
-      Style
-  | "track" ->
-      Track
-  | "video" ->
-      Video
-  | e ->
-      raise (Failure ("Unknown requestType: " ^ e))
+  | "audio" -> Audio
+  | "" -> None
+  | "font" -> Font
+  | "image" -> Image
+  | "script" -> Script
+  | "style" -> Style
+  | "track" -> Track
+  | "video" -> Video
+  | e -> raise (Failure ("Unknown requestType: " ^ e))
 
 type request_destination =
   | None (* default? unknown? just empty string in spec *)
@@ -181,86 +133,61 @@ type request_destination =
 
 let decode_request_destination = (* internal *)
   function
-  | "document" ->
-      Document
-  | "" ->
-      None
-  | "embed" ->
-      Embed
-  | "font" ->
-      Font
-  | "image" ->
-      Image
-  | "manifest" ->
-      Manifest
-  | "media" ->
-      Media
-  | "object" ->
-      Object
-  | "report" ->
-      Report
-  | "script" ->
-      Script
-  | "serviceworker" ->
-      ServiceWorker
-  | "sharedworder" ->
-      SharedWorker
-  | "style" ->
-      Style
-  | "worker" ->
-      Worker
-  | "xslt" ->
-      Xslt
-  | e ->
-      raise (Failure ("Unknown requestDestination: " ^ e))
+  | "document" -> Document
+  | "" -> None
+  | "embed" -> Embed
+  | "font" -> Font
+  | "image" -> Image
+  | "manifest" -> Manifest
+  | "media" -> Media
+  | "object" -> Object
+  | "report" -> Report
+  | "script" -> Script
+  | "serviceworker" -> ServiceWorker
+  | "sharedworder" -> SharedWorker
+  | "style" -> Style
+  | "worker" -> Worker
+  | "xslt" -> Xslt
+  | e -> raise (Failure ("Unknown requestDestination: " ^ e))
 
-type request_mode = Navigate | SameOrigin | NoCORS | CORS
+type request_mode =
+  | Navigate
+  | SameOrigin
+  | NoCORS
+  | CORS
 
 let encode_request_mode = (* internal *)
   function
-  | Navigate ->
-      "navigate"
-  | SameOrigin ->
-      "same-origin"
-  | NoCORS ->
-      "no-cors"
-  | CORS ->
-      "cors"
+  | Navigate -> "navigate"
+  | SameOrigin -> "same-origin"
+  | NoCORS -> "no-cors"
+  | CORS -> "cors"
 
 let decode_request_mode = (* internal *)
   function
-  | "navigate" ->
-      Navigate
-  | "same-origin" ->
-      SameOrigin
-  | "no-cors" ->
-      NoCORS
-  | "cors" ->
-      CORS
-  | e ->
-      raise (Failure ("Unknown requestMode: " ^ e))
+  | "navigate" -> Navigate
+  | "same-origin" -> SameOrigin
+  | "no-cors" -> NoCORS
+  | "cors" -> CORS
+  | e -> raise (Failure ("Unknown requestMode: " ^ e))
 
-type request_credentials = Omit | SameOrigin | Include
+type request_credentials =
+  | Omit
+  | SameOrigin
+  | Include
 
 let encode_request_credentials = (* internal *)
   function
-  | Omit ->
-      "omit"
-  | SameOrigin ->
-      "same-origin"
-  | Include ->
-      "include"
+  | Omit -> "omit"
+  | SameOrigin -> "same-origin"
+  | Include -> "include"
 
 let decode_request_credentials = (* internal *)
   function
-  | "omit" ->
-      Omit
-  | "same-origin" ->
-      SameOrigin
-  | "include" ->
-      Include
-  | e ->
-      raise (Failure ("Unknown requestCredentials: " ^ e))
+  | "omit" -> Omit
+  | "same-origin" -> SameOrigin
+  | "include" -> Include
+  | e -> raise (Failure ("Unknown requestCredentials: " ^ e))
 
 type request_cache =
   | Default
@@ -272,67 +199,46 @@ type request_cache =
 
 let encode_request_cache = (* internal *)
   function
-  | Default ->
-      "default"
-  | NoStore ->
-      "no-store"
-  | Reload ->
-      "reload"
-  | NoCache ->
-      "no-cache"
-  | ForceCache ->
-      "force-cache"
-  | OnlyIfCached ->
-      "only-if-cached"
+  | Default -> "default"
+  | NoStore -> "no-store"
+  | Reload -> "reload"
+  | NoCache -> "no-cache"
+  | ForceCache -> "force-cache"
+  | OnlyIfCached -> "only-if-cached"
 
 let decode_request_cache = (* internal *)
   function
-  | "default" ->
-      Default
-  | "no-store" ->
-      NoStore
-  | "reload" ->
-      Reload
-  | "no-cache" ->
-      NoCache
-  | "force-cache" ->
-      ForceCache
-  | "only-if-cached" ->
-      OnlyIfCached
-  | e ->
-      raise (Failure ("Unknown requestCache: " ^ e))
+  | "default" -> Default
+  | "no-store" -> NoStore
+  | "reload" -> Reload
+  | "no-cache" -> NoCache
+  | "force-cache" -> ForceCache
+  | "only-if-cached" -> OnlyIfCached
+  | e -> raise (Failure ("Unknown requestCache: " ^ e))
 
-type request_redirect = Follow | Error | Manual
+type request_redirect =
+  | Follow
+  | Error
+  | Manual
 
 let encode_request_redirect = (* internal *)
   function
-  | Follow ->
-      "follow"
-  | Error ->
-      "error"
-  | Manual ->
-      "manual"
+  | Follow -> "follow"
+  | Error -> "error"
+  | Manual -> "manual"
 
 let decode_request_redirect = (* internal *)
   function
-  | "follow" ->
-      Follow
-  | "error" ->
-      Error
-  | "manual" ->
-      Manual
-  | e ->
-      raise (Failure ("Unknown requestRedirect: " ^ e))
+  | "follow" -> Follow
+  | "error" -> Error
+  | "manual" -> Manual
+  | e -> raise (Failure ("Unknown requestRedirect: " ^ e))
 
 module Headers_init = struct
   type t = headers_init
 
   let make : (string * string) list -> headers_init js_t =
-   fun arr ->
-    Unsafe.obj
-      (Array.map
-         (fun (key, value) -> (key, Unsafe.inject (string value)))
-         (Array.of_list arr) )
+   fun arr -> Unsafe.obj (Array.map (fun (key, value) -> key, Unsafe.inject (string value)) (Array.of_list arr))
 end
 
 module Headers = struct
@@ -358,15 +264,12 @@ module Headers = struct
   let append : name:string -> value:string -> t js_t -> unit =
    fun ~name ~value headers -> headers##append (string name) (string value)
 
-  let delete : name:string -> t js_t -> unit =
-   fun ~name headers -> headers##delete (string name)
+  let delete : name:string -> t js_t -> unit = fun ~name headers -> headers##delete (string name)
 
   let get : name:string -> t js_t -> string option =
-   fun ~name headers ->
-    Option.map to_string (Opt.to_option (headers##get (string name)))
+   fun ~name headers -> Option.map to_string (Opt.to_option (headers##get (string name)))
 
-  let has : name:string -> t js_t -> bool =
-   fun ~name headers -> to_bool (headers##has (string name))
+  let has : name:string -> t js_t -> bool = fun ~name headers -> to_bool (headers##has (string name))
 
   let set : name:string -> value:string -> t js_t -> unit =
    fun ~name ~value headers -> headers##set (string name) (string value)
@@ -399,8 +302,7 @@ module Body = struct
 
       method bodyUsed : bool js_t readonly_prop
 
-      method arrayBuffer :
-        unit -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t meth
+      method arrayBuffer : unit -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t meth
 
       method blob : unit -> Js_of_ocaml.File.blob js_t Promise.t meth
 
@@ -415,15 +317,11 @@ module Body = struct
 
   let bodyUsed : t js_t -> bool js_t = fun body -> body##.bodyUsed
 
-  let arrayBuffer : t js_t -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t
-      =
-   fun body -> body##arrayBuffer ()
+  let arrayBuffer : t js_t -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t = fun body -> body##arrayBuffer ()
 
-  let blob : t js_t -> Js_of_ocaml.File.blob js_t Promise.t =
-   fun body -> body##blob ()
+  let blob : t js_t -> Js_of_ocaml.File.blob js_t Promise.t = fun body -> body##blob ()
 
-  let formData : t js_t -> Js_of_ocaml.Form.formData js_t Promise.t =
-   fun body -> body##formData ()
+  let formData : t js_t -> Js_of_ocaml.Form.formData js_t Promise.t = fun body -> body##formData ()
 
   let json : t js_t -> 'a js_t Promise.t = fun body -> body##json ()
 
@@ -435,55 +333,41 @@ module RequestInit = struct
 
   let wrap_opt_string : 'a option -> Unsafe.any option = function
     (* internal *)
-    | None ->
-        None
-    | Some v ->
-        Some (Unsafe.inject (string v))
+    | None -> None
+    | Some v -> Some (Unsafe.inject (string v))
 
-  let make :
-         ?method_:request_method
-      -> ?headers:headers_init js_t
-      -> ?body:Body_init.t js_t
-      -> ?referrer:string
-      -> ?referrerPolicy:referrer_policy
-      -> ?mode:request_mode
-      -> ?credentials:request_credentials
-      -> ?cache:request_cache
-      -> ?redirect:request_redirect
-      -> ?integrity:string
-      -> ?keepalive:bool
-      -> ?signal:signal js_t
-      -> unit
-      -> t js_t =
-   fun ?method_ ?headers ?body ?referrer ?referrerPolicy ?mode ?credentials
-       ?cache ?redirect ?integrity ?keepalive ?signal () ->
+  let make
+    :  ?method_:request_method -> ?headers:headers_init js_t -> ?body:Body_init.t js_t -> ?referrer:string ->
+    ?referrerPolicy:referrer_policy -> ?mode:request_mode -> ?credentials:request_credentials -> ?cache:request_cache ->
+    ?redirect:request_redirect -> ?integrity:string -> ?keepalive:bool -> ?signal:signal js_t -> unit -> t js_t
+    =
+   fun ?method_ ?headers ?body ?referrer ?referrerPolicy ?mode ?credentials ?cache ?redirect ?integrity ?keepalive
+     ?signal () ->
     let options =
       List.filter_map
         (fun (name, (v : 'a option)) ->
-          match v with None -> None | Some v -> Some (name, v) )
-        [ ("method", wrap_opt_string (Option.map encode_request_method method_))
-        ; ("headers", Option.map Unsafe.inject headers)
-        ; ("body", Option.map Unsafe.inject body)
-        ; ("referrer", wrap_opt_string referrer)
-        ; ( "referrerPolicy"
-          , wrap_opt_string (Option.map encode_referrer_policy referrerPolicy)
-          )
-        ; ("mode", wrap_opt_string (Option.map encode_request_mode mode))
-        ; ( "credentials"
-          , wrap_opt_string (Option.map encode_request_credentials credentials)
-          )
-        ; ("cache", wrap_opt_string (Option.map encode_request_cache cache))
-        ; ( "redirect"
-          , wrap_opt_string (Option.map encode_request_redirect redirect) )
-        ; ("integrity", wrap_opt_string integrity)
-        ; ("keepalive", Option.map (fun v -> Unsafe.inject (bool v)) keepalive)
-        ; ("signal", Option.map Unsafe.inject signal) ]
+          match v with
+          | None -> None
+          | Some v -> Some (name, v)
+        )
+        [
+          "method", wrap_opt_string (Option.map encode_request_method method_);
+          "headers", Option.map Unsafe.inject headers;
+          "body", Option.map Unsafe.inject body;
+          "referrer", wrap_opt_string referrer;
+          "referrerPolicy", wrap_opt_string (Option.map encode_referrer_policy referrerPolicy);
+          "mode", wrap_opt_string (Option.map encode_request_mode mode);
+          "credentials", wrap_opt_string (Option.map encode_request_credentials credentials);
+          "cache", wrap_opt_string (Option.map encode_request_cache cache);
+          "redirect", wrap_opt_string (Option.map encode_request_redirect redirect);
+          "integrity", wrap_opt_string integrity;
+          "keepalive", Option.map (fun v -> Unsafe.inject (bool v)) keepalive;
+          "signal", Option.map Unsafe.inject signal;
+        ]
     in
     match options with
-    | [] ->
-        Unsafe.inject undefined
-    | l ->
-        Unsafe.obj (Array.of_list l)
+    | [] -> Unsafe.inject undefined
+    | l -> Unsafe.obj (Array.of_list l)
 end
 
 module Request = struct
@@ -526,15 +410,11 @@ module Request = struct
 
   let bodyUsed : t js_t -> bool js_t = fun body -> body##.bodyUsed
 
-  let arrayBuffer : t js_t -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t
-      =
-   fun body -> body##arrayBuffer ()
+  let arrayBuffer : t js_t -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t = fun body -> body##arrayBuffer ()
 
-  let blob : t js_t -> Js_of_ocaml.File.blob js_t Promise.t =
-   fun body -> body##blob ()
+  let blob : t js_t -> Js_of_ocaml.File.blob js_t Promise.t = fun body -> body##blob ()
 
-  let formData : t js_t -> Js_of_ocaml.Form.formData js_t Promise.t =
-   fun body -> body##formData ()
+  let formData : t js_t -> Js_of_ocaml.Form.formData js_t Promise.t = fun body -> body##formData ()
 
   let json : t js_t -> 'a js_t Promise.t = fun body -> body##json ()
 
@@ -546,43 +426,33 @@ module Request = struct
 
   let make : js_string js_t -> t js_t constr = request_constr
 
-  let make_withInit : js_string js_t -> request_init js_t -> t js_t constr =
-    request_constr
+  let make_withInit : js_string js_t -> request_init js_t -> t js_t constr = request_constr
 
   let make_withRequest : t js_t -> t js_t constr = request_constr
 
-  let make_withRequestInit : t js_t -> request_init -> t js_t constr =
-    request_constr
+  let make_withRequestInit : t js_t -> request_init -> t js_t constr = request_constr
 
-  let method_ : t js_t -> request_method =
-   fun req -> decode_request_method (to_string req##._method)
+  let method_ : t js_t -> request_method = fun req -> decode_request_method (to_string req##._method)
 
   let url : t js_t -> string = fun req -> to_string req##.url
 
   let headers : t js_t -> Headers.t js_t = fun req -> req##.headers
 
-  let type_ : t js_t -> request_type =
-   fun req -> decode_request_type (to_string req##._type)
+  let type_ : t js_t -> request_type = fun req -> decode_request_type (to_string req##._type)
 
-  let destination : t js_t -> request_destination =
-   fun req -> decode_request_destination (to_string req##.destination)
+  let destination : t js_t -> request_destination = fun req -> decode_request_destination (to_string req##.destination)
 
   let referrer : t js_t -> string = fun req -> to_string req##.referrer
 
-  let referrer_policy : t js_t -> referrer_policy =
-   fun req -> decode_referrer_policy (to_string req##.referrerPolicy)
+  let referrer_policy : t js_t -> referrer_policy = fun req -> decode_referrer_policy (to_string req##.referrerPolicy)
 
-  let mode : t js_t -> request_mode =
-   fun req -> decode_request_mode (to_string req##.mode)
+  let mode : t js_t -> request_mode = fun req -> decode_request_mode (to_string req##.mode)
 
-  let credentials : t js_t -> request_credentials =
-   fun req -> decode_request_credentials (to_string req##.credentials)
+  let credentials : t js_t -> request_credentials = fun req -> decode_request_credentials (to_string req##.credentials)
 
-  let cache : t js_t -> request_cache =
-   fun req -> decode_request_cache (to_string req##.cache)
+  let cache : t js_t -> request_cache = fun req -> decode_request_cache (to_string req##.cache)
 
-  let redirect : t js_t -> request_redirect =
-   fun req -> decode_request_redirect (to_string req##.redirect)
+  let redirect : t js_t -> request_redirect = fun req -> decode_request_redirect (to_string req##.redirect)
 
   let integrity : t js_t -> string = fun req -> to_string req##.integrity
 
@@ -632,15 +502,11 @@ module Response = struct
 
   let bodyUsed : t js_t -> bool js_t = fun body -> body##.bodyUsed
 
-  let arrayBuffer : t js_t -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t
-      =
-   fun body -> body##arrayBuffer ()
+  let arrayBuffer : t js_t -> Js_of_ocaml.Typed_array.arrayBuffer js_t Promise.t = fun body -> body##arrayBuffer ()
 
-  let blob : t js_t -> Js_of_ocaml.File.blob js_t Promise.t =
-   fun body -> body##blob ()
+  let blob : t js_t -> Js_of_ocaml.File.blob js_t Promise.t = fun body -> body##blob ()
 
-  let formData : t js_t -> Js_of_ocaml.Form.formData js_t Promise.t =
-   fun body -> body##formData ()
+  let formData : t js_t -> Js_of_ocaml.Form.formData js_t Promise.t = fun body -> body##formData ()
 
   let json : t js_t -> 'a js_t Promise.t = fun body -> body##json ()
 
@@ -668,17 +534,13 @@ end
 let unsafe_fetch = Unsafe.global##.fetch
 
 let fetch : string -> Response.t js_t Promise.t =
- fun resource -> Unsafe.fun_call unsafe_fetch [|Unsafe.inject (string resource)|]
+ fun resource -> Unsafe.fun_call unsafe_fetch [| Unsafe.inject (string resource) |]
 
 let fetch_withInit : string -> request_init js_t -> Response.t js_t Promise.t =
- fun resource init ->
-  Unsafe.fun_call unsafe_fetch
-    [|Unsafe.inject (string resource); Unsafe.inject init|]
+ fun resource init -> Unsafe.fun_call unsafe_fetch [| Unsafe.inject (string resource); Unsafe.inject init |]
 
 let fetch_withRequest : Request.t -> Response.t js_t Promise.t =
- fun req -> Unsafe.fun_call unsafe_fetch [|Unsafe.inject req|]
+ fun req -> Unsafe.fun_call unsafe_fetch [| Unsafe.inject req |]
 
-let fetch_withRequestInit :
-    Request.t -> request_init js_t -> Response.t js_t Promise.t =
- fun req init ->
-  Unsafe.fun_call unsafe_fetch [|Unsafe.inject req; Unsafe.inject init|]
+let fetch_withRequestInit : Request.t -> request_init js_t -> Response.t js_t Promise.t =
+ fun req init -> Unsafe.fun_call unsafe_fetch [| Unsafe.inject req; Unsafe.inject init |]

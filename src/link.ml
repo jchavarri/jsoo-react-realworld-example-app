@@ -1,16 +1,18 @@
 [@@@react.dom]
 
-type location'
+type location' = string
 
-type onClickAction = Location of location' | CustomFn of (unit -> unit)
+type onClickAction =
+  | Location of location'
+  | CustomFn of (unit -> unit)
 
 let customFn fn = CustomFn fn
 
 let location location = Location location
 
-external make : string -> location' = "%identity"
+let make : string -> location' = fun a -> a
 
-external toString : location' -> string = "%identity"
+let toString : location' -> string = fun a -> a
 
 let home = make "/"
 
@@ -22,17 +24,15 @@ let login = make "/#/login"
 
 let createArticle = make "/#/editor"
 
-let editArticle ~slug = make ({js|/#/editor/|js} ^ slug)
+let editArticle ~slug = make ("/#/editor/" ^ slug)
 
-let article ~slug = make ({js|/#/article/|js} ^ slug)
+let article ~slug = make ("/#/article/" ^ slug)
 
-let profile ~username = make ({js|/#/profile/|js} ^ username)
+let profile ~username = make ("/#/profile/" ^ username)
 
-let favorited ~username =
-  make (({js|/#/profile/|js} ^ username) ^ {js|/favorites|js})
+let favorited ~username = make (("/#/profile/" ^ username) ^ "/favorites")
 
-let push : location' -> unit =
- fun location -> location |> toString |> React.Router.push
+let push : location' -> unit = fun location -> location |> toString |> React.Router.push
 
 let availableIf : bool -> onClickAction -> onClickAction =
  fun available target -> if available then target else CustomFn ignore
@@ -40,25 +40,22 @@ let availableIf : bool -> onClickAction -> onClickAction =
 let handleClick onClick event =
   ( match onClick with
   | Location location ->
-      if Utils.isMouseRightClick event then (
-        event |> React.Event.Mouse.preventDefault ;
-        location |> toString |> React.Router.push )
-  | CustomFn fn ->
-      fn () ) ;
+    if Utils.isMouseRightClick event then (
+      event |> React.Event.Mouse.preventDefault;
+      location |> toString |> React.Router.push
+    )
+  | CustomFn fn -> fn ()
+  );
   ignore ()
 
-let%component make ?(className = "") ?(style = React.Dom.Style.make ()) ~onClick
-    ~children =
+let%component make ?(className = "") ?(style = React.Dom.Style.make ()) ~onClick ~children =
   match onClick with
   | Location location ->
-      a ~className ~href:(location |> toString) ~style
-        ~onClick:(handleClick onClick) ~children ()
-  | CustomFn _fn ->
-      a ~className ~style ~onClick:(handleClick onClick) ~children ()
+    let href = location |> toString in
+    a ~className ~href ~style ~onClick:(handleClick onClick) ~children ()
+  | CustomFn _fn -> a ~className ~style ~onClick:(handleClick onClick) ~children ()
 
 module Button = struct
-  let%component make ?(className = "") ?(style = React.Dom.Style.make ())
-      ~onClick ?(disabled = false) ~children =
-    button ~className ~style ~onClick:(handleClick onClick) ~disabled ~children
-      ()
+  let%component make ?(className = "") ?(style = React.Dom.Style.make ()) ~onClick ?(disabled = false) ~children =
+    button ~className ~style ~onClick:(handleClick onClick) ~disabled ~children ()
 end

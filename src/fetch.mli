@@ -66,9 +66,16 @@ type request_destination =
   | Worker
   | Xslt
 
-type request_mode = Navigate | SameOrigin | NoCORS | CORS
+type request_mode =
+  | Navigate
+  | SameOrigin
+  | NoCORS
+  | CORS
 
-type request_credentials = Omit | SameOrigin | Include
+type request_credentials =
+  | Omit
+  | SameOrigin
+  | Include
 
 type request_cache =
   | Default
@@ -78,7 +85,10 @@ type request_cache =
   | ForceCache
   | OnlyIfCached
 
-type request_redirect = Follow | Error | Manual
+type request_redirect =
+  | Follow
+  | Error
+  | Manual
 
 module Headers_init : sig
   type t = headers_init
@@ -132,8 +142,7 @@ end
 module Body : sig
   class type t =
     object
-      method arrayBuffer :
-        unit -> Typed_array.arrayBuffer Js.t Promise.t Js.meth
+      method arrayBuffer : unit -> Typed_array.arrayBuffer Js.t Promise.t Js.meth
 
       method blob : unit -> File.blob Js.t Promise.t Js.meth
 
@@ -166,21 +175,21 @@ end
 module RequestInit : sig
   type t = request_init
 
-  val make :
-       ?method_:request_method
-    -> ?headers:headers_init Js.t
-    -> ?body:body_init Js.t
-    -> ?referrer:string
-    -> ?referrerPolicy:referrer_policy
-    -> ?mode:request_mode
-    -> ?credentials:request_credentials
-    -> ?cache:request_cache
-    -> ?redirect:request_redirect
-    -> ?integrity:string
-    -> ?keepalive:bool
-    -> ?signal:signal Js.t
-    -> unit
-    -> t Js.t
+  val make
+    :  ?method_:request_method ->
+    ?headers:headers_init Js.t ->
+    ?body:body_init Js.t ->
+    ?referrer:string ->
+    ?referrerPolicy:referrer_policy ->
+    ?mode:request_mode ->
+    ?credentials:request_credentials ->
+    ?cache:request_cache ->
+    ?redirect:request_redirect ->
+    ?integrity:string ->
+    ?keepalive:bool ->
+    ?signal:signal Js.t ->
+    unit ->
+    t Js.t
 end
 
 module Request : sig
@@ -190,8 +199,7 @@ module Request : sig
 
       method _type : Js.js_string Js.t Js.readonly_prop
 
-      method arrayBuffer :
-        unit -> Js_of_ocaml.Typed_array.arrayBuffer Js.t Promise.t Js.meth
+      method arrayBuffer : unit -> Js_of_ocaml.Typed_array.arrayBuffer Js.t Promise.t Js.meth
 
       method blob : unit -> Js_of_ocaml.File.blob Js.t Promise.t Js.meth
 
@@ -288,8 +296,7 @@ module Response : sig
     object
       method _type : Js.js_string Js.t Js.readonly_prop
 
-      method arrayBuffer :
-        unit -> Typed_array.arrayBuffer Js.t Promise.t Js.meth
+      method arrayBuffer : unit -> Typed_array.arrayBuffer Js.t Promise.t Js.meth
 
       method blob : unit -> File.blob Js.t Promise.t Js.meth
 
@@ -366,5 +373,4 @@ val fetch_withInit : string -> request_init Js.t -> Response.t Js.t Promise.t
 
 val fetch_withRequest : Request.t -> Response.t Js.t Promise.t
 
-val fetch_withRequestInit :
-  Request.t -> request_init Js.t -> Response.t Js.t Promise.t
+val fetch_withRequestInit : Request.t -> request_init Js.t -> Response.t Js.t Promise.t

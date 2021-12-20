@@ -14,33 +14,33 @@ let monthInMs = 30. *. dayInMs
 
 let parseCookies : unit -> cookiePair list =
  fun () ->
-  Dom_html.document##.cookie |> Js.to_string |> String.split_on_char ';'
+  Dom_html.document##.cookie
+  |> Js.to_string
+  |> String.split_on_char ';'
   |> List.fold_left
        (fun acc str ->
          let pair = str |> String.split_on_char '=' |> List.map String.trim in
          let key = List.nth pair 0 in
          let value = List.nth_opt pair 1 in
-         (key, value) :: acc )
+         (key, value) :: acc
+       )
        []
 
 let getCookie (name : string) : cookiePair option =
   parseCookies ()
   |> List.find_opt (fun pair ->
-         let key = fst pair in
-         key = name )
+       let key = fst pair in
+       key = name
+     )
 
-let setCookieRaw :
-       key:string
-    -> ?value:string
-    -> expires:string
-    -> ?path:string
-    -> unit
-    -> unit =
+let setCookieRaw : key:string -> ?value:string -> expires:string -> ?path:string -> unit -> unit =
  fun ~key ?value ~expires ?path () ->
   let htmlDocument = Dom_html.document in
   let value = value |> Option.value ~default:"" in
   let expires =
-    match expires with "" -> "" | _ -> "expires=" ^ expires ^ ";"
+    match expires with
+    | "" -> ""
+    | _ -> "expires=" ^ expires ^ ";"
   in
   let path =
     Option.bind path (fun path -> if path = "" then None else Some path)
@@ -54,12 +54,9 @@ let setCookie : string -> string option -> unit =
  fun key value ->
   let expires = new%js Js.date_now in
   let _ = expires##setTime (expires##getTime +. monthInMs) in
-  setCookieRaw ~key ?value
-    ~expires:(Js.to_string expires##toUTCString)
-    ~path:"/" ()
+  setCookieRaw ~key ?value ~expires:(Js.to_string expires##toUTCString) ~path:"/" ()
 
-let deleteCookie : string -> unit =
- fun key -> setCookieRaw ~key ~expires:"Thu, 01 Jan 1970 00:00:01 GMT" ()
+let deleteCookie : string -> unit = fun key -> setCookieRaw ~key ~expires:"Thu, 01 Jan 1970 00:00:01 GMT" ()
 
 let isMouseRightClick event =
   (not (React.Event.Mouse.defaultPrevented event))
