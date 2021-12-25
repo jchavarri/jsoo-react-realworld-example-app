@@ -3,15 +3,10 @@
  (modes js)
  (libraries promise_jsoo js_of_ocaml jsoo-react.lib)
  (js_of_ocaml
+  ; (flags --pretty) 
   (javascript_files react-requires.js))
  (preprocess
   (pps ppx_jsobject_conv js_of_ocaml-ppx jsoo-react.ppx)))
-
-(rule
- (targets bindings.ml)
- (deps bindings.mli)
- (action
-  (run gen_js_api %{deps})))
 
 (alias
  (name default)

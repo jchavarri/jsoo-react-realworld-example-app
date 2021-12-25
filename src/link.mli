@@ -32,7 +32,6 @@ val availableIf : bool -> onClickAction -> onClickAction
 
 val make
   :  ?className:string ->
-  ?style:React.Dom.style ->
   onClick:onClickAction ->
   children:React.element list ->
   ?key:string ->
@@ -42,7 +41,6 @@ val make
 module Button : sig
   val make
     :  ?className:string ->
-    ?style:React.Dom.style ->
     onClick:onClickAction ->
     ?disabled:bool ->
     children:React.element list ->

@@ -7,6 +7,27 @@ type user = {
 }
 [@@deriving jsobject]
 
+type update_user = {
+  email : string;
+  username : string;
+  bio : string option;
+  image : string option;
+  password : string option;
+}
+[@@deriving jsobject]
+
+type update_user_body = { user : update_user } [@@deriving jsobject]
+
+type login_user = {
+  email : string;
+  password : string;
+}
+[@@deriving jsobject]
+
+type login_body = { user : login_user } [@@deriving jsobject]
+
+type login_error = string list option [@@deriving jsobject]
+
 type author = {
   username : string;
   bio : string option;
@@ -35,3 +56,6 @@ type settings = {
   username : string array option;
   password : string array option;
 }
+[@@deriving jsobject]
+
+type 'a errors = { errors : 'a } [@@deriving jsobject]

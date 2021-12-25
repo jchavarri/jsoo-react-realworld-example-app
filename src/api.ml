@@ -23,27 +23,25 @@ module Headers = struct
     |> Option.map (fun token -> [ "Authorization", "Token " ^ token ])
     |> Option.value ~default:[]
 
-  let add_content_type_as_json : unit -> (string * string) array =
-   fun () -> [| "Content-Type", "application/json; charset=UTF-8" |]
+  let add_content_type_as_json : unit -> (string * string) list =
+   fun () -> [ "Content-Type", "application/json; charset=UTF-8" ]
 end
 
-(*
-    let getErrorBodyJson :
-        (Js.Json.t, Response.t) result -> (Js.Json.t, AppError.t) result Promise.t =
-     fun x ->
-      match x with
-      | Ok _json as ok ->
-          ok |> resolve
-      | Error resp ->
-          resp |> Response.json
-          |> then_ (fun json ->
-                 let status = Response.status resp in
-                 let statusText = Response.statusText resp in
-                 let bodyJson = `json json in
-                 AppError.fetch (status, statusText, bodyJson)
-                 |> Belt.Result.Error |> resolve )
-*)
-let getErrorBodyText : ('a Js.t, Fetch.Response.t Js.t) result -> ('a Js.t, App_error.t) result Promise.t =
+let getErrorBodyJson : ('a Js.t, Fetch.Response.t Js.t) result -> ('a Js.t, 'b App_error.t) result Promise.t =
+ fun x ->
+  match x with
+  | Ok _json as ok -> ok |> Promise.resolve
+  | Error resp ->
+    resp
+    |> Fetch.Response.json
+    |> Promise.then_ ~fulfilled:(fun json ->
+         let status = Fetch.Response.status resp in
+         let statusText = Fetch.Response.statusText resp in
+         let bodyJson = `json json in
+         Result.Error (App_error.fetch (status, statusText, bodyJson)) |> Promise.resolve
+       )
+
+let getErrorBodyText : ('a Js.t, Fetch.Response.t Js.t) result -> ('a Js.t, 'b App_error.t) result Promise.t =
  fun x ->
   let open Promise in
   match x with
@@ -211,7 +209,7 @@ let parseJsonIfOk : Fetch.Response.t Js.t -> ('a Js.t, Fetch.Response.t Js.t) re
             |> resolve )
 *)
 
-let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
+let currentUser : unit -> (Shape.user, 'a App_error.t) result Promise.t =
  fun () ->
   let requestInit =
     let headers = Fetch.Headers_init.make (Headers.add_jwt_token ()) in
@@ -225,41 +223,45 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
   |> then_ ~fulfilled:(fun result ->
        Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
      )
+
+let updateUser : user:Shape.user -> password:string -> unit -> (Shape.user, 'a App_error.t) result Promise.t =
+ fun ~user ~password () ->
+  let body =
+    Js_of_ocaml.Js._JSON##stringify
+      (Shape.jsobject_of_update_user_body
+         {
+           user =
+             {
+               email = user.email;
+               username = user.username;
+               bio = user.bio;
+               image = user.image;
+               password =
+                 ( match password with
+                 | "" -> None
+                 | pw -> Some pw
+                 );
+             };
+         }
+      )
+    |> Js_of_ocaml.Js.to_string
+    |> Fetch.Body_init.make
+  in
+  let requestInit =
+    Fetch.RequestInit.make ~method_:Put
+      ~headers:(Fetch.Headers_init.make (List.concat [ Headers.add_jwt_token (); Headers.add_content_type_as_json () ]))
+      ~body ()
+  in
+  let open Promise in
+  Endpoints.user
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
+     )
+
 (*
-   let updateUser :
-          user:Shape.User.t
-       -> password:string
-       -> unit
-       -> (Shape.User.t, AppError.t) result Promise.t =
-    fun ~user ~password () ->
-     let user =
-       [ [("email", Js.Json.string user.email)]
-       ; [("bio", Js.Json.string (user.bio |> Belt.Option.getWithDefault ""))]
-       ; [("image", Js.Json.string (user.image |> Belt.Option.getWithDefault ""))]
-       ; [("username", Js.Json.string user.username)]
-       ; (if password = "" then [] else [("password", Js.Json.string password)]) ]
-       |> List.flatten |> Js.Dict.fromList |> Js.Json.object_
-     in
-     let body =
-       [("user", user)] |> Js.Dict.fromList |> Js.Json.object_ |> Js.Json.stringify
-       |> BodyInit.make
-     in
-     let requestInit =
-       RequestInit.make ~method_:Put
-         ~headers:
-           ( Headers.addJwtToken ()
-           |> Belt.Array.concat (Headers.add_content_type_as_json ())
-           |> HeadersInit.makeWithArray )
-         ~body ()
-     in
-     Endpoints.user
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyJson
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.User.decode |> AppError.decode )
-            |> resolve )
 
    let followUser :
           action:Action.follow
@@ -388,9 +390,27 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
                      AppError.decode
                        (Belt.Result.Error "API.getProfile: failed to decode json") )
             |> resolve )
-
-   let login ~(email : string) ~(password : string) () :
-       (Shape.User.t, AppError.t) result Promise.t =
+*)
+let login ~(email : string) ~(password : string) () : (Shape.user, 'a App_error.t) result Promise.t =
+  let body =
+    Js_of_ocaml.Js._JSON##stringify (Shape.jsobject_of_login_body { user = { email; password } })
+    |> Js_of_ocaml.Js.to_string
+    |> Fetch.Body_init.make
+  in
+  let requestInit =
+    Fetch.RequestInit.make ~method_:Post
+      ~headers:(Fetch.Headers_init.make (Headers.add_content_type_as_json ()))
+      ~body ()
+  in
+  let open Promise in
+  Endpoints.Users.login
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
+     )
+(* 
      let user =
        [("email", Js.Json.string email); ("password", Js.Json.string password)]
        |> Js.Dict.fromList |> Js.Json.object_
@@ -411,8 +431,8 @@ let currentUser : unit -> (Shape.user, App_error.t) result Promise.t =
             result
             |> Belt.Result.flatMap (fun json ->
                    json |> Shape.User.decode |> AppError.decode )
-            |> resolve )
-
+            |> resolve ) *)
+(*
    let register :
           username:string
        -> email:string

@@ -7,7 +7,7 @@ let authenticated : (Shape.user -> React.element) -> Shape.user option -> React.
     React.null
 
 let%component make () =
-  let currentUser, _setCurrentUser = Hook.useCurrentUser () in
+  let currentUser, setCurrentUser = Hook.useCurrentUser () in
   let route = Route.useRoute () in
   match currentUser with
   | Init | Loading -> React.null
@@ -17,8 +17,8 @@ let%component make () =
         [
           Header.make ~user ();
           ( match route with
-          | Settings -> (fun user -> Settings.createElement ~user ~setUser:setCurrentUser ~children:[] ()) user
-          | Login -> React.string "Login" (* Login.createElement ~setUser:setCurrentUser ~children:[] () *)
+          | Settings -> authenticated (fun user -> Settings.make ~user ~setUser:setCurrentUser ()) user
+          | Login -> Login.make ~setUser:setCurrentUser ()
           | Register -> React.string "Register" (* Register.createElement ~setUser:setCurrentUser ~children:[] () *)
           | CreateArticle ->
             React.string "CreateArticle"

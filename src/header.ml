@@ -3,12 +3,8 @@
 let%component make ~user =
   let currentUser =
     match user with
-    | Some user ->
-      Js_of_ocaml.Firebug.console##log "some";
-      user
-    | None ->
-      Js_of_ocaml.Firebug.console##log "none";
-      { Shape.email = ""; username = ""; bio = None; image = None; token = "" }
+    | Some user -> user
+    | None -> { Shape.email = ""; username = ""; bio = None; image = None; token = "" }
   in
   nav ~className:"navbar navbar-light"
     ~children:

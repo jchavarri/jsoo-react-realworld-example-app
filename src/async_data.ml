@@ -38,14 +38,14 @@ let getValue v =
   | Reloading a -> Some a
   | Complete a -> Some a
 
-let map v fn =
+let map fn v =
   match v with
   | Init -> Init
   | Loading -> Loading
   | Reloading a -> Reloading (fn a)
   | Complete a -> Complete (fn a)
 
-let tapComplete v fn =
+let tapComplete fn v =
   match v with
   | Init -> v
   | Loading -> v
