@@ -221,7 +221,13 @@ let currentUser : unit -> (Shape.user, 'a App_error.t) result Promise.t =
   |> then_ ~fulfilled:parseJsonIfOk
   |> then_ ~fulfilled:getErrorBodyText
   |> then_ ~fulfilled:(fun result ->
-       Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.user_response_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.user_response) -> response.user)
+         |> App_error.decode
+       )
+       |> resolve
      )
 
 let updateUser : user:Shape.user -> password:string -> unit -> (Shape.user, 'a App_error.t) result Promise.t =
@@ -408,7 +414,14 @@ let login ~(email : string) ~(password : string) () : (Shape.user, 'a App_error.
   |> then_ ~fulfilled:parseJsonIfOk
   |> then_ ~fulfilled:getErrorBodyText
   |> then_ ~fulfilled:(fun result ->
-       Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
+       Js_of_ocaml.Firebug.console##log result;
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.user_response_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.user_response) -> response.user)
+         |> App_error.decode
+       )
+       |> resolve
      )
 (* 
      let user =

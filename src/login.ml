@@ -104,7 +104,9 @@ let%component make ~setUser =
                                                         email, password, errors
                                                       )
                                                  )
-                                               | Error _e -> ignore ()
+                                               | Error e ->
+                                                 Js_of_ocaml.Firebug.console##log_2 "Error decoding error json" e;
+                                                 ignore ()
                                              with _ ->
                                                Js_of_ocaml.Firebug.console##log "Button.SignIn: failed to decode json"
                                            )

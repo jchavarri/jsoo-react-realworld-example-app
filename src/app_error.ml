@@ -9,4 +9,6 @@ let fetch : int * string * [ `text of string | `json of 'a Js.t ] -> 'a t = fun 
 let decode (result : ('a, string) result) : ('a, 'b t) result =
   match result with
   | Ok _ok as ok -> ok
-  | Error err -> Error (Decode err)
+  | Error err ->
+    Js_of_ocaml.Firebug.console##log_2 "error" result;
+    Error (Decode err)

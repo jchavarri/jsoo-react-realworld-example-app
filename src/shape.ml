@@ -7,6 +7,8 @@ type user = {
 }
 [@@deriving jsobject]
 
+type user_response = { user : user } [@@deriving jsobject]
+
 type update_user = {
   email : string;
   username : string;
