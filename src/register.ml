@@ -1,11 +1,10 @@
 [@@@react.dom]
 
-type nonrec t = {
+type t = {
   username : string;
   email : string;
   password : string;
 }
-[@@nonrec]
 
 external to_input_element : Ojs.t -> Js_of_ocaml.Dom_html.inputElement Js_of_ocaml.Js.t = "%identity"
 

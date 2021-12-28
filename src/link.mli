@@ -1,6 +1,6 @@
-type nonrec location'
+type location'
 
-type nonrec onClickAction =
+type onClickAction =
   | Location of location'
   | CustomFn of (unit -> unit)
 
