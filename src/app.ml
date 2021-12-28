@@ -19,12 +19,8 @@ let%component make () =
           ( match route with
           | Settings -> authenticated (fun user -> Settings.make ~user ~setUser:setCurrentUser ()) user
           | Login -> Login.make ~setUser:setCurrentUser ()
-          | Register -> React.string "Register" (* Register.createElement ~setUser:setCurrentUser ~children:[] () *)
-          | CreateArticle ->
-            React.string "CreateArticle"
-            (* authenticated
-                   (fun _user -> Editor.createElement ~children:[] ())
-                   user *)
+          | Register -> Register.make ~setUser:setCurrentUser ()
+          | CreateArticle -> authenticated (fun _user -> Editor.make ()) user
           | EditArticle _slug ->
             React.string "EditArticle"
             (* authenticated

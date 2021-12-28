@@ -18,7 +18,7 @@ type update_user = {
 }
 [@@deriving jsobject]
 
-type update_user_body = { user : update_user } [@@deriving jsobject]
+type 'a user_body = { user : 'a } [@@deriving jsobject]
 
 type login_user = {
   email : string;
@@ -38,18 +38,29 @@ type author = {
 }
 [@@deriving jsobject]
 
-type article = {
+type article_response = {
   slug : string;
   title : string;
   description : string;
   body : string;
-  tagList : string array;
+  tagList : string list;
   createdAt : Utils.Timestamp_str.t;
   updatedAt : Utils.Timestamp_str.t;
   favorited : bool;
   favoritesCount : int;
   author : author;
 }
+[@@deriving jsobject]
+
+type create_article = {
+  title : string;
+  description : string;
+  body : string;
+  tagList : string list;
+}
+[@@deriving jsobject]
+
+type 'a article = { article : 'a } [@@deriving jsobject]
 
 type settings = {
   email : string array option;
@@ -61,3 +72,24 @@ type settings = {
 [@@deriving jsobject]
 
 type 'a errors = { errors : 'a } [@@deriving jsobject]
+
+type register_error = {
+  email : string array option;
+  password : string array option;
+  username : string array option;
+}
+[@@deriving jsobject]
+
+type register = {
+  email : string;
+  password : string;
+  username : string;
+}
+[@@deriving jsobject]
+
+type editor_error = {
+  title : string array option;
+  body : string array option;
+  description : string array option;
+}
+[@@deriving jsobject]

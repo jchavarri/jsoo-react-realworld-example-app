@@ -2,9 +2,9 @@ open Js_of_ocaml
 
 module Action = struct
   type article =
-    | Create of Shape.article
+    | Create of Shape.article_response
     | Read of string
-    | Update of string * Shape.article
+    | Update of string * Shape.article_response
     | Delete of string
 
   type follow =
@@ -64,69 +64,66 @@ let parseJsonIfOk : Fetch.Response.t Js.t -> ('a Js.t, Fetch.Response.t Js.t) re
     |> catch ~rejected:(fun _error -> Error resp |> resolve)
   | false -> Error resp |> resolve
 
+let article : action:Action.article -> unit -> (Shape.article_response, 'a App_error.t) result Promise.t =
+ fun ~action () ->
+  let body =
+    match action with
+    | Create article | Update (_, article) ->
+      Some
+        (Js_of_ocaml.Js._JSON##stringify
+           (Shape.jsobject_of_article Shape.jsobject_of_create_article
+              {
+                article =
+                  {
+                    title = article.title;
+                    description = article.description;
+                    body = article.body;
+                    tagList = article.tagList;
+                  };
+              }
+           )
+        |> Js_of_ocaml.Js.to_string
+        |> Fetch.Body_init.make
+        )
+    | Read _ | Delete _ -> None
+  in
+  let method__ =
+    match action with
+    | Create _ -> Fetch.Post
+    | Read _ -> Get
+    | Update _ -> Put
+    | Delete _ -> Delete
+  in
+  let headers =
+    List.concat
+      [
+        ( match action with
+        | Create _ | Update _ -> Headers.add_content_type_as_json ()
+        | Read _ | Delete _ -> []
+        );
+        Headers.add_jwt_token ();
+      ]
+    |> Fetch.Headers_init.make
+  in
+  let slug =
+    match action with
+    | Create _ -> ""
+    | Read slug | Update (slug, _) | Delete slug -> slug
+  in
+  let open Promise in
+  Fetch.fetch_withInit (Endpoints.Articles.article ~slug ()) (Fetch.RequestInit.make ~method_:method__ ~headers ?body ())
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyJson
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.article_of_jsobject Shape.article_response_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.article_response Shape.article) -> response.article)
+         |> App_error.decode
+       )
+       |> resolve
+     )
 (*
-   let article :
-          action:Action.article
-       -> unit
-       -> (Shape_t.article, AppError.t) result Promise.t =
-    fun ~action () ->
-     let body =
-       match action with
-       | Create article | Update (_, article) ->
-           let article =
-             [ ("title", Js.Json.string article.title)
-             ; ("description", Js.Json.string article.description)
-             ; ("body", Js.Json.string article.body)
-             ; ("tagList", Js.Json.stringArray article.tagList) ]
-             |> Js.Dict.fromList |> Js.Json.object_
-           in
-           [("article", article)] |> Js.Dict.fromList |> Js.Json.object_
-           |> Js.Json.stringify |> BodyInit.make |> Some
-       | Read _ | Delete _ ->
-           None
-     in
-     let method__ =
-       match action with
-       | Create _ ->
-           Post
-       | Read _ ->
-           Get
-       | Update _ ->
-           Put
-       | Delete _ ->
-           Delete
-     in
-     let headers =
-       ( match action with
-       | Create _ | Update _ ->
-           Headers.add_content_type_as_json ()
-       | Read _ | Delete _ ->
-           [||] )
-       |> Belt.Array.concat (Headers.addJwtToken ())
-       |> HeadersInit.makeWithArray
-     in
-     let slug =
-       match action with
-       | Create _ ->
-           ""
-       | Read slug | Update (slug, _) | Delete slug ->
-           slug
-     in
-     fetchWithInit
-       (Endpoints.Articles.article ~slug ())
-       (RequestInit.make ~method_:method__ ~headers ?body ())
-     |> then_ parseJsonIfOk |> then_ getErrorBodyJson
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   try
-                     json |> Js.Json.decodeObject |> Belt.Option.getExn
-                     |> Js.Dict.get "article" |> Belt.Option.getExn
-                     |> Shape.Article.decode |> AppError.decode
-                   with _ ->
-                     AppError.decode (Error "API.article: failed to decode json") )
-            |> resolve )
-
    let favoriteArticle :
           action:Action.favorite
        -> unit
@@ -234,7 +231,7 @@ let updateUser : user:Shape.user -> password:string -> unit -> (Shape.user, 'a A
  fun ~user ~password () ->
   let body =
     Js_of_ocaml.Js._JSON##stringify
-      (Shape.jsobject_of_update_user_body
+      (Shape.jsobject_of_user_body Shape.jsobject_of_update_user
          {
            user =
              {
@@ -445,34 +442,27 @@ let login ~(email : string) ~(password : string) () : (Shape.user, 'a App_error.
             |> Belt.Result.flatMap (fun json ->
                    json |> Shape.User.decode |> AppError.decode )
             |> resolve ) *)
-(*
-   let register :
-          username:string
-       -> email:string
-       -> password:string
-       -> unit
-       -> (Shape.User.t, AppError.t) result Promise.t =
-    fun ~username ~email ~password () ->
-     let user =
-       [ ("email", Js.Json.string email)
-       ; ("password", Js.Json.string password)
-       ; ("username", Js.Json.string username) ]
-       |> Js.Dict.fromList |> Js.Json.object_
-     in
-     let body =
-       [("user", user)] |> Js.Dict.fromList |> Js.Json.object_ |> Js.Json.stringify
-       |> BodyInit.make
-     in
-     let requestInit =
-       RequestInit.make ~method_:Post
-         ~headers:(Headers.add_content_type_as_json () |> HeadersInit.makeWithArray)
-         ~body ()
-     in
-     Endpoints.Users.root
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyJson
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.User.decode |> AppError.decode )
-            |> resolve ) *)
+
+let register
+  : username:string -> email:string -> password:string -> unit -> (Shape.user, 'a App_error.t) result Promise.t
+  =
+ fun ~username ~email ~password () ->
+  let body =
+    Js_of_ocaml.Js._JSON##stringify
+      (Shape.jsobject_of_user_body Shape.jsobject_of_register { user = { email; username; password } })
+    |> Js_of_ocaml.Js.to_string
+    |> Fetch.Body_init.make
+  in
+  let requestInit =
+    Fetch.RequestInit.make ~method_:Post
+      ~headers:(Fetch.Headers_init.make (Headers.add_content_type_as_json ()))
+      ~body ()
+  in
+  let open Promise in
+  Endpoints.Users.root
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyJson
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
+     )
