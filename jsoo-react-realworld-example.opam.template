@@ -1,4 +1,4 @@
 pin-depends: [
   [ "jsoo-react.dev" "git+https://github.com/ml-in-barcelona/jsoo-react.git#d7290d3" ]
-  [ "ppx_jsobject_conv.dev" "git+https://github.com/jchavarri/ppx_jsobject_conv.git#951f9a8" ]
+  [ "ppx_jsobject_conv.dev" "git+https://github.com/little-arhat/ppx_jsobject_conv.git#b1c43be" ]
 ]
