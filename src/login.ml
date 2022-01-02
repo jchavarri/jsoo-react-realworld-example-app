@@ -25,7 +25,8 @@ let%component make ~setUser =
                             ~children:
                               [
                                 Link.make ~onClick:(Link.register |> Link.location)
-                                  ~children:[ "Need an account?" |> React.string ] ();
+                                  ~children:[ "Need an account?" |> React.string ]
+                                  ();
                               ]
                             ();
                           ( match error with
@@ -116,7 +117,8 @@ let%component make ~setUser =
                                        )
                                     |> ignore
                                   )
-                                  ~children:[ "Sign in" |> React.string ] ();
+                                  ~children:[ "Sign in" |> React.string ]
+                                  ();
                               ]
                             ();
                         ]

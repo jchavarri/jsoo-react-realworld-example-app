@@ -1,3 +1,28 @@
+module Profile = struct
+  type username = string
+
+  type limit = int
+
+  type offset = int
+
+  type viewMode =
+    | Author of username * limit * offset
+    | Favorited of username * limit * offset
+end
+
+module Feed_type = struct
+  type tag = string
+
+  type limit = int
+
+  type offset = int
+
+  type t =
+    | Tag of tag * limit * offset
+    | Global of limit * offset
+    | Personal of limit * offset
+end
+
 type user = {
   email : string;
   username : string;
@@ -52,6 +77,12 @@ type article_response = {
 }
 [@@deriving jsobject]
 
+type articles = {
+  articles : article_response array;
+  articlesCount : int;
+}
+[@@deriving jsobject]
+
 type create_article = {
   title : string;
   description : string;
@@ -93,3 +124,5 @@ type editor_error = {
   description : string array option;
 }
 [@@deriving jsobject]
+
+type tags = { tags : string array } [@@deriving jsobject]

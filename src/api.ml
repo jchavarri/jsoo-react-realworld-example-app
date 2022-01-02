@@ -123,88 +123,89 @@ let article : action:Action.article -> unit -> (Shape.article_response, 'a App_e
        )
        |> resolve
      )
-(*
-   let favoriteArticle :
-          action:Action.favorite
-       -> unit
-       -> (Shape_t.article, AppError.t) result Promise.t =
-    fun ~action () ->
-     let requestInit =
-       RequestInit.make
-         ~method_:
-           (match action with Favorite _slug -> Post | Unfavorite _slug -> Delete)
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Articles.favorite
-       ~slug:(match action with Favorite slug -> slug | Unfavorite slug -> slug)
-       ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   try
-                     json |> Js.Json.decodeObject |> Belt.Option.getExn
-                     |> Js.Dict.get "article" |> Belt.Option.getExn
-                     |> Shape.Article.decode |> AppError.decode
-                   with _ ->
-                     AppError.decode
-                       (Error "API.favoriteArticle: failed to decode json") )
-            |> resolve )
 
-   let listArticles :
-          ?limit:int
-       -> ?offset:int
-       -> ?tag:string
-       -> ?author:string
-       -> ?favorited:string
-       -> unit
-       -> (Shape.Articles.t, AppError.t) result Promise.t =
-    fun ?(limit = 10) ?(offset = 0) ?tag ?author ?favorited () ->
-     let requestInit =
-       RequestInit.make
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Articles.root ~limit ~offset ?tag ?author ?favorited ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.Articles.decode |> AppError.decode )
-            |> resolve )
+let favoriteArticle : action:Action.favorite -> unit -> (Shape.article_response, 'a App_error.t) result Promise.t =
+ fun ~action () ->
+  let requestInit =
+    Fetch.RequestInit.make
+      ~method_:
+        ( match action with
+        | Favorite _slug -> Post
+        | Unfavorite _slug -> Delete
+        )
+      ~headers:(Headers.add_jwt_token () |> Fetch.Headers_init.make)
+      ()
+  in
+  let open Promise in
+  Endpoints.Articles.favorite
+    ~slug:
+      ( match action with
+      | Favorite slug -> slug
+      | Unfavorite slug -> slug
+      )
+    ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.article_of_jsobject Shape.article_response_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.article_response Shape.article) -> response.article)
+         |> App_error.decode
+       )
+       |> resolve
+     )
 
-   let feedArticles :
-          ?limit:int
-       -> ?offset:int
-       -> unit
-       -> (Shape.Articles.t, AppError.t) result Promise.t =
-    fun ?(limit = 10) ?(offset = 0) () ->
-     let requestInit =
-       RequestInit.make
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Articles.feed ~limit ~offset ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.Articles.decode |> AppError.decode )
-            |> resolve )
+let listArticles
+  :  ?limit:int -> ?offset:int -> ?tag:string -> ?author:string -> ?favorited:string -> unit ->
+  (Shape.articles, 'a App_error.t) result Promise.t
+  =
+ fun ?(limit = 10) ?(offset = 0) ?tag ?author ?favorited () ->
+  let requestInit =
+    let headers = Fetch.Headers_init.make (Headers.add_jwt_token ()) in
+    Fetch.RequestInit.make ~headers ()
+  in
+  let open Promise in
+  Endpoints.Articles.root ~limit ~offset ?tag ?author ?favorited ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json -> json |> Shape.articles_of_jsobject |> App_error.decode) |> resolve
+     )
 
-   let tags : unit -> (Shape.Tags.t, AppError.t) result Promise.t =
-    fun () ->
-     Endpoints.tags |> fetch |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.Tags.decode |> AppError.decode )
-            |> resolve )
-*)
+let feedArticles : ?limit:int -> ?offset:int -> unit -> (Shape.articles, 'a App_error.t) result Promise.t =
+ fun ?(limit = 10) ?(offset = 0) () ->
+  let requestInit =
+    let headers = Fetch.Headers_init.make (Headers.add_jwt_token ()) in
+    Fetch.RequestInit.make ~headers ()
+  in
+  let open Promise in
+  Endpoints.Articles.feed ~limit ~offset ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json -> json |> Shape.articles_of_jsobject |> App_error.decode) |> resolve
+     )
+
+let tags : unit -> (string array, 'a App_error.t) result Promise.t =
+ fun () ->
+  let open Promise in
+  Endpoints.tags
+  |> Fetch.fetch
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.tags_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.tags) -> response.tags)
+         |> App_error.decode
+       )
+       |> resolve
+     )
 
 let currentUser : unit -> (Shape.user, 'a App_error.t) result Promise.t =
  fun () ->

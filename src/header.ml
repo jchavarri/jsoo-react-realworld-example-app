@@ -13,7 +13,8 @@ let%component make ~user =
           ~children:
             [
               Link.make ~className:"navbar-brand" ~onClick:(Link.location Link.home)
-                ~children:[ React.string "conduit" ] ();
+                ~children:[ React.string "conduit" ]
+                ();
               ul ~className:"nav navbar-nav pull-xs-right"
                 ~children:
                   [
@@ -21,7 +22,8 @@ let%component make ~user =
                       ~children:
                         [
                           Link.make ~className:"nav-link active" ~onClick:(Link.location Link.home)
-                            ~children:[ React.string "Home" ] ();
+                            ~children:[ React.string "Home" ]
+                            ();
                         ]
                       ();
                     Security.AnonymousOnly.make ~user
@@ -31,14 +33,16 @@ let%component make ~user =
                             ~children:
                               [
                                 Link.make ~className:"nav-link" ~onClick:(Link.location Link.login)
-                                  ~children:[ React.string "Sign in" ] ();
+                                  ~children:[ React.string "Sign in" ]
+                                  ();
                               ]
                             ();
                           li ~className:"nav-item"
                             ~children:
                               [
                                 Link.make ~className:"nav-link" ~onClick:(Link.location Link.register)
-                                  ~children:[ React.string "Sign up" ] ();
+                                  ~children:[ React.string "Sign up" ]
+                                  ();
                               ]
                             ();
                         ]
@@ -67,7 +71,8 @@ let%component make ~user =
                               [
                                 Link.make ~className:"nav-link"
                                   ~onClick:(Link.profile ~username:currentUser.username |> Link.location)
-                                  ~children:[ React.string currentUser.username ] ();
+                                  ~children:[ React.string currentUser.username ]
+                                  ();
                               ]
                             ();
                         ]

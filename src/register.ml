@@ -33,7 +33,8 @@ let%component make ~setUser =
                             ~children:
                               [
                                 Link.make ~onClick:(Link.login |> Link.location)
-                                  ~children:[ "Have an account?" |> React.string ] ();
+                                  ~children:[ "Have an account?" |> React.string ]
+                                  ();
                               ]
                             ();
                           ( match error with
@@ -132,7 +133,8 @@ let%component make ~setUser =
                                       |> ignore
                                     )
                                   )
-                                  ~children:[ "Sign up" |> React.string ] ();
+                                  ~children:[ "Sign up" |> React.string ]
+                                  ();
                               ]
                             ();
                         ]

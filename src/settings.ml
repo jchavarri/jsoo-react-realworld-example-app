@@ -179,7 +179,8 @@ let%component make ~(user : Shape.user)
                                              )
                                           |> ignore
                                         )
-                                        ~children:[ "Update Settings" |> React.string ] ();
+                                        ~children:[ "Update Settings" |> React.string ]
+                                        ();
                                     ]
                                   ();
                               ]

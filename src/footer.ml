@@ -24,7 +24,8 @@ let%component make () =
                 ~children:
                   [
                     Link.make ~onClick:(Link.location Link.home) ~className:"logo-font"
-                      ~children:[ React.string "conduit" ] ();
+                      ~children:[ React.string "conduit" ]
+                      ();
                     span ~className:"attribution"
                       ~children:
                         [

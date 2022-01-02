@@ -1,8 +1,8 @@
 open Promise
 
-(* type asyncArticles = (Shape.Articles.t, App_error.t) Async_result.t
+type 'a asyncArticles = (Shape.articles, 'a App_error.t) Async_result.t
 
-type asyncTags = (Shape.Tags.t, App_error.t) Async_result.t *)
+type 'a asyncTags = (string array, 'a App_error.t) Async_result.t
 
 type asyncData = Shape.user option Async_data.t
 
@@ -13,33 +13,32 @@ type 'a asyncArticle = (Shape.article_response, 'a App_error.t) Async_result.t
 
 (* type asyncComment = (Shape.Comment.t array, App_error.t) Async_result.t
 
-type asyncAuthor = (Shape.Author.t, App_error.t) Async_result.t [@@nonrec]
-
-let useArticles ~(feedType : Shape.FeedType.t) : asyncArticles * ((asyncArticles -> asyncArticles) -> unit) =
+type asyncAuthor = (Shape.Author.t, App_error.t) Async_result.t
+*)
+let useArticles ~(feedType : Shape.Feed_type.t) : 'a asyncArticles * (('a asyncArticles -> 'a asyncArticles) -> unit) =
   let data, setData = React.useState (fun () -> Async_result.init) in
   React.useEffect2
     (fun () ->
-      setData (fun prev -> prev |. Async_result.toBusy);
+      setData (fun prev -> prev |> Async_result.toBusy);
       ( match feedType with
-      | ((Tag (tag, limit, offset)) ) ->
-        API.listArticles ~limit ~offset ?tag:(Some tag ) ()
-      | ((Global (limit, offset)) ) -> API.listArticles ~limit ~offset ()
-      | ((Personal (limit, offset)) ) -> API.feedArticles ~limit ~offset ()
+      | Tag (tag, limit, offset) -> Api.listArticles ~limit ~offset ?tag:(Some tag) ()
+      | Global (limit, offset) -> Api.listArticles ~limit ~offset ()
+      | Personal (limit, offset) -> Api.feedArticles ~limit ~offset ()
       )
-      |. then_ (fun data ->
+      |> then_ ~fulfilled:(fun data ->
            setData (fun _prev ->
              match data with
-             | ((Ok ok) ) -> Async_result.completeOk ok
-             | ((Error error) ) -> Async_result.completeError error
+             | Ok ok -> Async_result.completeOk ok
+             | Error error -> Async_result.completeError error
            )
-           |. resolve
+           |> resolve
          )
-      |. ignore;
+      |> ignore;
       None
     )
     (feedType, setData);
   data, setData
-
+(*
 let useArticlesInProfile : viewMode:Shape.Profile.viewMode -> asyncArticles * ((asyncArticles -> asyncArticles) -> unit)
   =
  fun ~viewMode ->
@@ -64,25 +63,26 @@ let useArticlesInProfile : viewMode:Shape.Profile.viewMode -> asyncArticles * ((
     )
     (viewMode, setData);
   data, setData
+*)
 
-let useTags : unit -> asyncTags =
+let useTags : unit -> 'a asyncTags =
  fun () ->
   let data, setData = React.useState (fun () -> Async_result.init) in
   React.useEffect0 (fun () ->
-    setData (fun prev -> prev |. Async_result.getOk |. Belt.Option.getWithDefault [||] |. Async_result.reloadingOk);
-    API.tags ()
-    |. then_ (fun data ->
+    setData (fun prev -> prev |> Async_result.getOk |> Stdlib.Option.value ~default:[||] |> Async_result.reloadingOk);
+    Api.tags ()
+    |> then_ ~fulfilled:(fun data ->
          setData (fun _prev ->
            match data with
-           | ((Ok ok) ) -> ok |. Async_result.completeOk
-           | ((Error error) ) -> Async_result.completeError error
+           | Ok ok -> ok |> Async_result.completeOk
+           | Error error -> Async_result.completeError error
          )
-         |. resolve
+         |> resolve
        )
-    |. ignore;
+    |> ignore;
     None
   );
-  data *)
+  data
 
 let useCurrentUser : unit -> asyncData * ((asyncData -> asyncData) -> unit) =
  fun () ->
@@ -351,32 +351,34 @@ let useDeleteArticle : article:asyncArticle -> user:Shape.User.t option -> bool 
     | Some _, true | None, (true | false) -> Link.CustomFn ignore 
   in
   state, onClick
+*)
+module SS = Set.Make (String)
 
 let useToggleFavorite
-  :  setArticles:((asyncArticles -> asyncArticles) -> unit) -> user:Shape.User.t option ->
-  Belt.Set.String.t * (action:API.Action.favorite -> unit)
+  :  setArticles:(('a asyncArticles -> 'a asyncArticles) -> unit) -> user:Shape.user option ->
+  SS.t * (action:Api.Action.favorite -> unit)
   =
  fun ~setArticles ~user ->
-  let busy, setBusy = React.useState (fun () -> Belt.Set.String.empty) in
+  let busy, setBusy = React.useState (fun () -> SS.empty) in
   let sendRequest ~action =
     let slug =
-      match (action : API.Action.favorite) with
-      | ((Favorite slug) ) | ((Unfavorite slug) ) -> slug
+      match (action : Api.Action.favorite) with
+      | Favorite slug | Unfavorite slug -> slug
     in
-    setBusy (fun prev -> prev |. fun __x -> Belt.Set.String.add __x slug);
-    API.favoriteArticle ~action ()
-    |. then_ (fun data ->
-         setBusy (fun prev -> prev |. fun __x -> Belt.Set.String.remove __x slug);
+    setBusy (fun prev -> prev |> fun __x -> SS.add slug __x);
+    Api.favoriteArticle ~action ()
+    |> then_ ~fulfilled:(fun data ->
+         setBusy (fun prev -> prev |> fun __x -> SS.remove slug __x);
          ( match data with
          | Ok _ ->
            setArticles (fun prev ->
              prev
-             |. Async_result.map (fun (articles : Shape.Articles.t) ->
+             |> Async_result.map (fun (articles : Shape.articles) ->
                   {
                     articles with
                     articles =
                       articles.articles
-                      |. Belt.Array.map (fun (article : Shape.article_response) ->
+                      |> Stdlib.Array.map (fun (article : Shape.article_response) ->
                            if article.slug = slug then
                              {
                                article with
@@ -396,12 +398,12 @@ let useToggleFavorite
                   }
                 )
            )
-         | ((Error _error) ) -> ignore ()
+         | Error _error -> ignore ()
          );
-         ignore () |. resolve
+         ignore () |> resolve
        )
-    |. catch (fun _error -> setBusy (fun prev -> prev |. fun __x -> Belt.Set.String.remove __x slug) |. resolve)
-    |. ignore
+    |> catch ~rejected:(fun _error -> setBusy (fun prev -> prev |> fun __x -> SS.remove slug __x) |> resolve)
+    |> ignore
   in
   let onToggle ~action =
     match user with
@@ -409,7 +411,7 @@ let useToggleFavorite
     | None -> Link.push Link.register
   in
   busy, onToggle
-
+(*
 let useProfile : username:string -> asyncAuthor =
  fun ~username ->
   let data, setData = React.useState (fun () -> Async_result.init) in

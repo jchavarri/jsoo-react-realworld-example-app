@@ -21,11 +21,7 @@ let%component make () =
           | Login -> Login.make ~setUser:setCurrentUser ()
           | Register -> Register.make ~setUser:setCurrentUser ()
           | CreateArticle -> authenticated (fun _user -> Editor.make ()) user
-          | EditArticle _slug ->
-            React.string "EditArticle"
-            (* authenticated
-                   (fun _user -> Editor.createElement ~slug ~children:[] ())
-                   user *)
+          | EditArticle slug -> authenticated (fun _user -> Editor.make ~slug ()) user
           | Article _slug -> React.string "Article" (* Article.createElement ~slug ~user ~children:[] () *)
           | Profile _username ->
             React.string "Profile"
@@ -37,9 +33,8 @@ let%component make () =
             (* Profile.createElement
                    ~viewMode:(Shape.Profile.Favorited (username, 10, 0))
                    ~user ~children:[] () *)
-          | Home -> React.string "Home"
-          )
-          (* Home.createElement ~user ~children:[] () ) *);
+          | Home -> Home.make ~user ()
+          );
           Footer.make ();
         ]
       ()

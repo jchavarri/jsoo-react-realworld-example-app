@@ -192,7 +192,8 @@ module Form = struct
                             | None -> ignore ()
                           )
                         )
-                        ~children:[ "Publish Article" |> React.string ] ();
+                        ~children:[ "Publish Article" |> React.string ]
+                        ();
                     ]
                   ();
               ]
