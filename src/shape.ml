@@ -126,3 +126,5 @@ type editor_error = {
 [@@deriving jsobject]
 
 type tags = { tags : string array } [@@deriving jsobject]
+
+type profile = { author : author } [@@deriving jsobject]

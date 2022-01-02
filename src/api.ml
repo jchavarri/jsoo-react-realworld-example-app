@@ -265,42 +265,38 @@ let updateUser : user:Shape.user -> password:string -> unit -> (Shape.user, 'a A
        Stdlib.Result.bind result (fun json -> json |> Shape.user_of_jsobject |> App_error.decode) |> resolve
      )
 
+let followUser : action:Action.follow -> unit -> (Shape.author, 'a App_error.t) result Promise.t =
+ fun ~action () ->
+  let requestInit =
+    let headers = Fetch.Headers_init.make (Headers.add_jwt_token ()) in
+    Fetch.RequestInit.make
+      ~method_:
+        ( match action with
+        | Follow _username -> Post
+        | Unfollow _username -> Delete
+        )
+      ~headers ()
+  in
+  let open Promise in
+  Endpoints.Profiles.follow
+    ~username:
+      ( match action with
+      | Follow username | Unfollow username -> username
+      )
+    ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.profile_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.profile) -> response.author)
+         |> App_error.decode
+       )
+       |> resolve
+     )
 (*
-
-   let followUser :
-          action:Action.follow
-       -> unit
-       -> (Shape.Author.t, AppError.t) result Promise.t =
-    fun ~action () ->
-     let requestInit =
-       RequestInit.make
-         ~method_:
-           ( match action with
-           | Follow _username ->
-               Post
-           | Unfollow _username ->
-               Delete )
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Profiles.follow
-       ~username:
-         (match action with Follow username | Unfollow username -> username)
-       ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   try
-                     json |> Js.Json.decodeObject |> Belt.Option.getExn
-                     |> Js.Dict.get "profile" |> Belt.Option.getExn
-                     |> Shape.Author.decode |> AppError.decode
-                   with _ ->
-                     AppError.decode
-                       (Belt.Result.Error "API.followUser: failed to decode json") )
-            |> resolve )
-
    let getComments :
        slug:string -> unit -> (Shape.Comment.t array, AppError.t) result Promise.t
        =
@@ -371,30 +367,29 @@ let updateUser : user:Shape.user -> password:string -> unit -> (Shape.user, 'a A
                      AppError.decode
                        (Belt.Result.Error "API.addComment: failed to decode json") )
             |> resolve )
-
-   let getProfile :
-       username:string -> unit -> (Shape.Author.t, AppError.t) result Promise.t =
-    fun ~username () ->
-     let requestInit =
-       RequestInit.make
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Profiles.profile ~username ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   try
-                     json |> Js.Json.decodeObject |> Belt.Option.getExn
-                     |> Js.Dict.get "profile" |> Belt.Option.getExn
-                     |> Shape.Author.decode |> AppError.decode
-                   with _ ->
-                     AppError.decode
-                       (Belt.Result.Error "API.getProfile: failed to decode json") )
-            |> resolve )
 *)
+
+let getProfile : username:string -> unit -> (Shape.author, 'a App_error.t) result Promise.t =
+ fun ~username () ->
+  let requestInit =
+    let headers = Fetch.Headers_init.make (Headers.add_jwt_token ()) in
+    Fetch.RequestInit.make ~headers ()
+  in
+  let open Promise in
+  Endpoints.Profiles.profile ~username ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.profile_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.profile) -> response.author)
+         |> App_error.decode
+       )
+       |> resolve
+     )
+
 let login ~(email : string) ~(password : string) () : (Shape.user, 'a App_error.t) result Promise.t =
   let body =
     Js_of_ocaml.Js._JSON##stringify (Shape.jsobject_of_login_body { user = { email; password } })
@@ -412,7 +407,6 @@ let login ~(email : string) ~(password : string) () : (Shape.user, 'a App_error.
   |> then_ ~fulfilled:parseJsonIfOk
   |> then_ ~fulfilled:getErrorBodyText
   |> then_ ~fulfilled:(fun result ->
-       Js_of_ocaml.Firebug.console##log result;
        Stdlib.Result.bind result (fun json ->
          json
          |> Shape.user_response_of_jsobject
@@ -421,28 +415,6 @@ let login ~(email : string) ~(password : string) () : (Shape.user, 'a App_error.
        )
        |> resolve
      )
-(* 
-     let user =
-       [("email", Js.Json.string email); ("password", Js.Json.string password)]
-       |> Js.Dict.fromList |> Js.Json.object_
-     in
-     let body =
-       [("user", user)] |> Js.Dict.fromList |> Js.Json.object_ |> Js.Json.stringify
-       |> BodyInit.make
-     in
-     let requestInit =
-       RequestInit.make ~method_:Post
-         ~headers:(Headers.add_content_type_as_json () |> HeadersInit.makeWithArray)
-         ~body ()
-     in
-     Endpoints.Users.login
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyJson
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.User.decode |> AppError.decode )
-            |> resolve ) *)
 
 let register
   : username:string -> email:string -> password:string -> unit -> (Shape.user, 'a App_error.t) result Promise.t

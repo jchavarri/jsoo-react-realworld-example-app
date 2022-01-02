@@ -11,10 +11,10 @@ type 'a asyncArticleEditor =
 
 type 'a asyncArticle = (Shape.article_response, 'a App_error.t) Async_result.t
 
-(* type asyncComment = (Shape.Comment.t array, App_error.t) Async_result.t
+(* type asyncComment = (Shape.Comment.t array, App_error.t) Async_result.t *)
 
-type asyncAuthor = (Shape.Author.t, App_error.t) Async_result.t
-*)
+type 'a asyncAuthor = (Shape.author, 'a App_error.t) Async_result.t
+
 let useArticles ~(feedType : Shape.Feed_type.t) : 'a asyncArticles * (('a asyncArticles -> 'a asyncArticles) -> unit) =
   let data, setData = React.useState (fun () -> Async_result.init) in
   React.useEffect2
@@ -38,32 +38,32 @@ let useArticles ~(feedType : Shape.Feed_type.t) : 'a asyncArticles * (('a asyncA
     )
     (feedType, setData);
   data, setData
-(*
-let useArticlesInProfile : viewMode:Shape.Profile.viewMode -> asyncArticles * ((asyncArticles -> asyncArticles) -> unit)
+
+let useArticlesInProfile
+  : viewMode:Shape.Profile.viewMode -> 'a asyncArticles * (('a asyncArticles -> 'a asyncArticles) -> unit)
   =
  fun ~viewMode ->
   let data, setData = React.useState (fun () -> Async_result.init) in
   React.useEffect2
     (fun () ->
-      setData (fun prev -> prev |. Async_result.toBusy);
+      setData (fun prev -> prev |> Async_result.toBusy);
       ( match viewMode with
-      | ((Author (author, limit, offset)) ) -> API.listArticles ~author ~limit ~offset ()
-      | ((Favorited (favorited, limit, offset)) ) -> API.listArticles ~favorited ~limit ~offset ()
+      | Author (author, limit, offset) -> Api.listArticles ~author ~limit ~offset ()
+      | Favorited (favorited, limit, offset) -> Api.listArticles ~favorited ~limit ~offset ()
       )
-      |. then_ (fun data ->
+      |> then_ ~fulfilled:(fun data ->
            setData (fun _prev ->
              match data with
-             | ((Ok ok) ) -> Async_result.completeOk ok
-             | ((Error error) ) -> Async_result.completeError error
+             | Ok ok -> Async_result.completeOk ok
+             | Error error -> Async_result.completeError error
            )
-           |. resolve
+           |> resolve
          )
-      |. ignore;
+      |> ignore;
       None
     )
     (viewMode, setData);
   data, setData
-*)
 
 let useTags : unit -> 'a asyncTags =
  fun () ->
@@ -195,7 +195,7 @@ let useFollow : article:asyncArticle -> user:Shape.User.t option -> (string * bo
       follow
       |. Async_data.getValue
       |. Belt.Option.flatMap (fun (_username, following) ->
-           if [@ns.ternary] following then Some (API.Action.Unfollow username ) 
+           if  following then Some (API.Action.Unfollow username ) 
            else None
          )
       |. Belt.Option.getWithDefault (API.Action.Follow username )
@@ -219,9 +219,9 @@ let useFollow : article:asyncArticle -> user:Shape.User.t option -> (string * bo
     | None -> Location Link.register 
   in
   follow, onClick
-
+*)
 let useFollowInProfile
-  : profile:asyncAuthor -> user:Shape.User.t option -> (string * bool) Async_data.t * Link.onClickAction
+  : profile:'a asyncAuthor -> user:Shape.user option -> (string * bool) Async_data.t * Link.onClickAction
   =
  fun ~profile ~user ->
   let state, setState = React.useState (fun () -> Async_data.init) in
@@ -229,47 +229,45 @@ let useFollowInProfile
     match state with
     | Init ->
       profile
-      |. Async_result.getOk
-      |. Belt.Option.map (fun (ok : Shape.Author.t) -> Async_data.complete (ok.username, ok.following))
-      |. Belt.Option.getWithDefault (Async_data.complete ("", false))
-    | ((((Loading as orig) | Reloading _) as orig) | Complete _) as orig -> orig
+      |> Async_result.getOk
+      |> Stdlib.Option.map (fun (ok : Shape.author) -> Async_data.complete (ok.username, ok.following))
+      |> Stdlib.Option.value ~default:(Async_data.complete ("", false))
+    | (Loading | Reloading _ | Complete _) as orig -> orig
   in
   let sendRequest () =
     let username =
       follow
-      |. Async_data.getValue
-      |. Belt.Option.map (fun (username, _following) -> username)
-      |. Belt.Option.getWithDefault ""
+      |> Async_data.getValue
+      |> Stdlib.Option.map (fun (username, _following) -> username)
+      |> Stdlib.Option.value ~default:""
     in
     let action =
-      follow
-      |. Async_data.getValue
-      |. Belt.Option.flatMap (fun (_username, following) ->
-           if [@ns.ternary] following then Some (API.Action.Unfollow username ) 
-           else None
-         )
-      |. Belt.Option.getWithDefault (API.Action.Follow username )
+      Stdlib.Option.bind (Async_data.getValue follow) (fun (_username, following) ->
+        if following then Some (Api.Action.Unfollow username) else None
+      )
+      |> Stdlib.Option.value ~default:(Api.Action.Follow username)
     in
-    setState (fun _prev -> follow |. Async_data.toBusy);
-    API.followUser ~action ()
-    |. then_ (fun data ->
+    setState (fun _prev -> follow |> Async_data.toBusy);
+    Api.followUser ~action ()
+    |> then_ ~fulfilled:(fun data ->
          setState (fun _prev ->
            match data with
-           | ((Ok (ok : Shape.Author.t)) ) -> Async_data.complete (ok.username, ok.following)
-           | ((Error _error) ) -> Async_data.complete ("", false)
+           | Ok (ok : Shape.author) -> Async_data.complete (ok.username, ok.following)
+           | Error _error -> Async_data.complete ("", false)
          )
-         |. resolve
+         |> resolve
        )
-    |. catch (fun _error -> setState (fun _prev -> Async_data.complete ("", false)) |. resolve)
-    |. ignore
+    |> catch ~rejected:(fun _error -> setState (fun _prev -> Async_data.complete ("", false)) |> resolve)
+    |> ignore
   in
   let onClick =
     match user with
-    | ((Some _user) ) -> Link.CustomFn (fun () -> sendRequest ()) 
-    | None -> Location Link.register 
+    | Some _user -> Link.CustomFn (fun () -> sendRequest ())
+    | None -> Location Link.register
   in
   follow, onClick
 
+(*
 let useFavorite ~(article : asyncArticle) ~(user : Shape.User.t option)
   : (bool * int * string) Async_data.t * Link.onClickAction
   =
@@ -290,7 +288,7 @@ let useFavorite ~(article : asyncArticle) ~(user : Shape.User.t option)
       favorite |. Async_data.getValue |. Belt.Option.getWithDefault (false, 0, "")
     in
     let action =
-      if [@ns.ternary] favorited then API.Action.Unfavorite slug 
+      if  favorited then API.Action.Unfavorite slug 
       else API.Action.Favorite slug 
     in
     setState (fun _prev -> favorite |. Async_data.toBusy);
@@ -411,23 +409,23 @@ let useToggleFavorite
     | None -> Link.push Link.register
   in
   busy, onToggle
-(*
-let useProfile : username:string -> asyncAuthor =
+
+let useProfile : username:string -> 'a asyncAuthor =
  fun ~username ->
   let data, setData = React.useState (fun () -> Async_result.init) in
   React.useEffect2
     (fun () ->
-      setData (fun prev -> prev |. Async_result.toBusy);
-      API.getProfile ~username ()
-      |. then_ (fun data ->
+      setData (fun prev -> prev |> Async_result.toBusy);
+      Api.getProfile ~username ()
+      |> then_ ~fulfilled:(fun data ->
            setData (fun _prev ->
              match data with
-             | ((Ok ok) ) -> Async_result.completeOk ok
-             | ((Error error) ) -> Async_result.completeError error
+             | Ok ok -> Async_result.completeOk ok
+             | Error error -> Async_result.completeError error
            )
-           |. resolve
+           |> resolve
          )
-      |. ignore;
+      |> ignore;
       None
     )
     (username, setData);
@@ -436,7 +434,7 @@ let useProfile : username:string -> asyncAuthor =
 let useViewMode : route:Shape.Profile.viewMode -> Shape.Profile.viewMode * (int -> unit) =
  fun ~route ->
   let viewMode, setViewMode = React.useState (fun () -> None) in
-  let finalViewMode = viewMode |. Belt.Option.getWithDefault route in
+  let finalViewMode = viewMode |> Stdlib.Option.value ~default:route in
   React.useEffect2
     (fun () ->
       setViewMode (fun _prev -> None);
@@ -445,13 +443,11 @@ let useViewMode : route:Shape.Profile.viewMode -> Shape.Profile.viewMode * (int 
     (route, setViewMode);
   let changeOffset offset =
     setViewMode (fun _prev ->
-      (Some
-         ( match finalViewMode with
-         | ((Author (username, limit, _offset)) ) -> Author (username, limit, offset) 
-         | ((Favorited (username, limit, _offset)) ) ->
-           Favorited (username, limit, offset) 
-         ) 
-      )
+      Some
+        ( match finalViewMode with
+        | Author (username, limit, _offset) -> Author (username, limit, offset)
+        | Favorited (username, limit, _offset) -> Favorited (username, limit, offset)
+        )
     )
   in
-  finalViewMode, changeOffset *)
+  finalViewMode, changeOffset
