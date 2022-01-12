@@ -5,7 +5,6 @@ module Popular_tags = Home_popular_tags
 
 let useFeedType ~(user : Shape.user option) =
   React.useState (fun () ->
-    Js_of_ocaml.Firebug.console##log "Here";
     match user with
     | None -> Shape.Feed_type.Global (10, 0)
     | Some _ -> Shape.Feed_type.Personal (10, 0)
