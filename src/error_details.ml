@@ -1,10 +1,12 @@
+[@@@react.dom]
+
 let%component make ~label ~error =
   error
   |> Option.map (fun message ->
        let children =
          message
          |> Array.map (fun message ->
-              (li ~key:message ~children:[ ((label ^ {js| |js}) ^ message |> React.string) [@ns.braces] ] () [@JSX])
+              li ~key:message ~children:[ ((label ^ {js| |js}) ^ message |> React.string) [@ns.braces] ] ()
             )
          |> Array.to_list
        in

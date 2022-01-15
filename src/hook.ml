@@ -1,4 +1,6 @@
 open Promise
+module SS = Set.Make (String)
+module SI = Set.Make (Int)
 
 type 'a asyncArticles = (Shape.articles, 'a App_error.t) Async_result.t
 
@@ -11,7 +13,7 @@ type 'a asyncArticleEditor =
 
 type 'a asyncArticle = (Shape.article_response, 'a App_error.t) Async_result.t
 
-(* type asyncComment = (Shape.Comment.t array, App_error.t) Async_result.t *)
+type 'a asyncComment = (Shape.comment array, 'a App_error.t) Async_result.t
 
 type 'a asyncAuthor = (Shape.author, 'a App_error.t) Async_result.t
 
@@ -124,102 +126,101 @@ let useArticle ~(slug : string) : 'a asyncArticleEditor * (('a asyncArticleEdito
     [| slug |];
   data, setData
 
-(* 
 let useComments
   :  slug:string ->
-  asyncComment * Belt.Set.Int.t * (slug:string -> id:int -> unit) * ((asyncComment -> asyncComment) -> unit)
+  'a asyncComment * SI.t * (slug:string -> id:int -> unit) * (('a asyncComment -> 'a asyncComment) -> unit)
   =
  fun ~slug ->
   let data, setData = React.useState (fun () -> Async_result.init) in
-  let busy, setBusy = React.useState (fun () -> Belt.Set.Int.empty) in
+  let busy, setBusy = React.useState (fun () -> SI.empty) in
   React.useEffect2
     (fun () ->
-      setData (fun prev -> prev |. Async_result.toBusy);
-      setBusy (fun _prev -> Belt.Set.Int.empty);
-      API.getComments ~slug ()
-      |. then_ (fun data ->
+      setData Async_result.toBusy;
+      setBusy (fun _prev -> SI.empty);
+      Api.getComments ~slug ()
+      |> then_ ~fulfilled:(fun data ->
            setData (fun _prev ->
              match data with
-             | ((Ok ok) ) -> Async_result.completeOk ok
-             | ((Error error) ) -> Async_result.completeError error
+             | Ok ok -> Async_result.completeOk ok
+             | Error error -> Async_result.completeError error
            )
-           |. resolve
+           |> resolve
          )
-      |. ignore;
+      |> ignore;
       None
     )
     (slug, setData);
   let deleteComment ~slug ~id =
-    setBusy (fun prev -> prev |. fun __x -> Belt.Set.Int.add __x id);
-    API.deleteComment ~slug ~id ()
-    |. then_ (fun resp ->
-         setBusy (fun prev -> prev |. fun __x -> Belt.Set.Int.remove __x id);
+    setBusy (SI.add id);
+    Api.deleteComment ~slug ~id ()
+    |> then_ ~fulfilled:(fun resp ->
+         setBusy (SI.remove id);
          ( match resp with
-         | ((Ok (_slug, id)) ) ->
+         | Ok (_slug, id) ->
            setData (fun prev ->
              prev
-             |. Async_result.map (fun comments ->
-                  comments |. Belt.Array.keep (fun (comment : Shape.Comment.t) -> comment.id <> id)
+             |> Async_result.map (fun comments ->
+                  comments
+                  |> Stdlib.Array.to_list
+                  |> Stdlib.List.filter (fun (comment : Shape.comment) -> comment.id <> id)
+                  |> Stdlib.Array.of_list
                 )
            )
-         | ((Error _error) ) -> ignore ()
+         | Error _error -> ignore ()
          );
-         ignore () |. resolve
+         ignore () |> resolve
        )
-    |. ignore
+    |> ignore
   in
   data, busy, deleteComment, setData
 
-let useFollow : article:asyncArticle -> user:Shape.User.t option -> (string * bool) Async_data.t * Link.onClickAction =
+let useFollow : article:'a asyncArticle -> user:Shape.user option -> (string * bool) Async_data.t * Link.onClickAction =
  fun ~article ~user ->
   let state, setState = React.useState (fun () -> Async_data.init) in
   let follow =
     match state with
     | Init ->
       article
-      |. Async_result.getOk
-      |. Belt.Option.map (fun (ok : Shape.article_response) ->
+      |> Async_result.getOk
+      |> Stdlib.Option.map (fun (ok : Shape.article_response) ->
            Async_data.complete (ok.author.username, ok.author.following)
          )
-      |. Belt.Option.getWithDefault (Async_data.complete ("", false))
-    | ((((Loading as orig) | Reloading _) as orig) | Complete _) as orig -> orig
+      |> Stdlib.Option.value ~default:(Async_data.complete ("", false))
+    | (Loading | Reloading _ | Complete _) as orig -> orig
   in
   let sendRequest () =
     let username =
       follow
-      |. Async_data.getValue
-      |. Belt.Option.map (fun (username, _following) -> username)
-      |. Belt.Option.getWithDefault ""
+      |> Async_data.getValue
+      |> Stdlib.Option.map (fun (username, _following) -> username)
+      |> Stdlib.Option.value ~default:""
     in
     let action =
-      follow
-      |. Async_data.getValue
-      |. Belt.Option.flatMap (fun (_username, following) ->
-           if  following then Some (API.Action.Unfollow username ) 
-           else None
-         )
-      |. Belt.Option.getWithDefault (API.Action.Follow username )
+      Stdlib.Option.bind (Async_data.getValue follow) (fun (_username, following) ->
+        if following then Some (Api.Action.Unfollow username) else None
+      )
+      |> Stdlib.Option.value ~default:(Api.Action.Follow username)
     in
-    setState (fun _prev -> follow |. Async_data.toBusy);
-    API.followUser ~action ()
-    |. then_ (fun data ->
+    setState (fun _prev -> follow |> Async_data.toBusy);
+    Api.followUser ~action ()
+    |> then_ ~fulfilled:(fun data ->
          setState (fun _prev ->
            match data with
-           | ((Ok (ok : Shape.Author.t)) ) -> Async_data.complete (ok.username, ok.following)
-           | ((Error _error) ) -> Async_data.complete ("", false)
+           | Ok (ok : Shape.author) -> Async_data.complete (ok.username, ok.following)
+           | Error _error -> Async_data.complete ("", false)
          )
-         |. resolve
+         |> resolve
        )
-    |. catch (fun _error -> setState (fun _prev -> Async_data.complete ("", false)) |. resolve)
-    |. ignore
+    |> catch ~rejected:(fun _error -> setState (fun _prev -> Async_data.complete ("", false)) |> resolve)
+    |> ignore
   in
   let onClick =
     match user with
-    | ((Some _user) ) -> Link.CustomFn (fun () -> sendRequest ()) 
-    | None -> Location Link.register 
+    | Some _user -> Link.CustomFn (fun () -> sendRequest ())
+    | None -> Location Link.register
   in
   follow, onClick
-*)
+
 let useFollowInProfile
   : profile:'a asyncAuthor -> user:Shape.user option -> (string * bool) Async_data.t * Link.onClickAction
   =
@@ -267,8 +268,7 @@ let useFollowInProfile
   in
   follow, onClick
 
-(*
-let useFavorite ~(article : asyncArticle) ~(user : Shape.User.t option)
+let useFavorite ~(article : 'a asyncArticle) ~(user : Shape.user option)
   : (bool * int * string) Async_data.t * Link.onClickAction
   =
   let state, setState = React.useState (fun () -> Async_data.init) in
@@ -276,81 +276,71 @@ let useFavorite ~(article : asyncArticle) ~(user : Shape.User.t option)
     match state with
     | Init ->
       article
-      |. Async_result.getOk
-      |. Belt.Option.map (fun (ok : Shape.article_response) ->
+      |> Async_result.getOk
+      |> Stdlib.Option.map (fun (ok : Shape.article_response) ->
            Async_data.complete (ok.favorited, ok.favoritesCount, ok.slug)
          )
-      |. Belt.Option.getWithDefault (Async_data.complete (false, 0, ""))
-    | ((((Loading as orig) | Reloading _) as orig) | Complete _) as orig -> orig
+      |> Stdlib.Option.value ~default:(Async_data.complete (false, 0, ""))
+    | (Loading | Reloading _ | Complete _) as orig -> orig
   in
   let sendRequest () =
     let favorited, _favoritesCount, slug =
-      favorite |. Async_data.getValue |. Belt.Option.getWithDefault (false, 0, "")
+      favorite |> Async_data.getValue |> Stdlib.Option.value ~default:(false, 0, "")
     in
-    let action =
-      if  favorited then API.Action.Unfavorite slug 
-      else API.Action.Favorite slug 
-    in
-    setState (fun _prev -> favorite |. Async_data.toBusy);
-    API.favoriteArticle ~action ()
-    |. then_ (fun data ->
+    let action = if favorited then Api.Action.Unfavorite slug else Api.Action.Favorite slug in
+    setState (fun _prev -> favorite |> Async_data.toBusy);
+    Api.favoriteArticle ~action ()
+    |> then_ ~fulfilled:(fun data ->
          setState (fun _prev ->
            match data with
-           | ((Ok (ok : Shape.article_response)) ) ->
-             Async_data.complete (ok.favorited, ok.favoritesCount, ok.slug)
-           | ((Error _error) ) -> Async_data.complete (false, 0, "")
+           | Ok (ok : Shape.article_response) -> Async_data.complete (ok.favorited, ok.favoritesCount, ok.slug)
+           | Error _error -> Async_data.complete (false, 0, "")
          )
-         |. resolve
+         |> resolve
        )
-    |. catch (fun _error -> setState (fun _prev -> Async_data.complete (false, 0, "")) |. resolve)
-    |. ignore
+    |> catch ~rejected:(fun _error -> setState (fun _prev -> Async_data.complete (false, 0, "")) |> resolve)
+    |> ignore
   in
   let onClick =
     match user with
-    | ((Some _user) ) -> Link.CustomFn (fun () -> sendRequest ()) 
-    | None -> Location Link.register 
+    | Some _user -> Link.CustomFn (fun () -> sendRequest ())
+    | None -> Location Link.register
   in
   favorite, onClick
 
-let useDeleteArticle : article:asyncArticle -> user:Shape.User.t option -> bool * Link.onClickAction =
+let useDeleteArticle : article:'a asyncArticle -> user:Shape.user option -> bool * Link.onClickAction =
  fun ~article ~user ->
   let state, setState = React.useState (fun () -> false) in
   let sendRequest () =
     let slug =
       article
-      |. Async_result.getOk
-      |. Belt.Option.map (fun (ok : Shape.article_response) -> ok.slug)
-      |. Belt.Option.getWithDefault ""
+      |> Async_result.getOk
+      |> Stdlib.Option.map (fun (ok : Shape.article_response) -> ok.slug)
+      |> Stdlib.Option.value ~default:""
     in
     setState (fun _prev -> true);
-    API.article ~action:(Delete slug ) ()
-    |. then_ (fun _data ->
+    Api.article ~action:(Delete slug) ()
+    |> then_ ~fulfilled:(fun _data ->
          setState (fun _prev -> false);
          Link.push Link.home;
-         ignore () |. resolve
+         ignore () |> resolve
        )
-    |. catch (fun _error -> setState (fun _prev -> false) |. resolve)
-    |. ignore
+    |> catch ~rejected:(fun _error -> setState (fun _prev -> false) |> resolve)
+    |> ignore
   in
   let onClick =
     match user, state with
-    | ((Some _user) ), false ->
+    | Some _user, false ->
       Link.CustomFn
         (fun () ->
-          if
-            Webapi.Dom.Window.confirm
-              ("Are you sure you want to delete this article?" [@reason.raw_literal
-                                                                 "Are you sure you want to delete this article?"]
-              )
-              Webapi.Dom.window
-          then sendRequest ()
+          let open Js_of_ocaml in
+          if Dom_html.window##confirm (Js.string "Are you sure you want to delete this article?") |> Js.to_bool then
+            sendRequest ()
           else ignore ()
-        ) 
-    | Some _, true | None, (true | false) -> Link.CustomFn ignore 
+        )
+    | Some _, true | None, (true | false) -> Link.CustomFn ignore
   in
   state, onClick
-*)
-module SS = Set.Make (String)
 
 let useToggleFavorite
   :  setArticles:(('a asyncArticles -> 'a asyncArticles) -> unit) -> user:Shape.user option ->

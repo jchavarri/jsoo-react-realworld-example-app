@@ -22,7 +22,7 @@ let%component make () =
           | Register -> Register.make ~setUser:setCurrentUser ()
           | CreateArticle -> authenticated (fun _user -> Editor.make ()) user
           | EditArticle slug -> authenticated (fun _user -> Editor.make ~slug ()) user
-          | Article _slug -> React.string "Article" (* Article.createElement ~slug ~user ~children:[] () *)
+          | Article slug -> Article.make ~slug ~user ()
           | Profile username -> Profile.make ~viewMode:(Shape.Profile.Author (username, 10, 0)) ~user ()
           | Favorited username -> Profile.make ~viewMode:(Shape.Profile.Favorited (username, 10, 0)) ~user ()
           | Home -> Home.make ~user ()

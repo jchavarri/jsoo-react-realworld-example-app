@@ -128,3 +128,28 @@ type editor_error = {
 type tags = { tags : string array } [@@deriving jsobject]
 
 type profile = { author : author } [@@deriving jsobject]
+
+type comment_user = {
+  username : string;
+  bio : string option;
+  image : string;
+  following : bool;
+}
+[@@deriving jsobject]
+
+type comment = {
+  id : int;
+  createdAt : Utils.Timestamp_str.t;
+  updatedAt : Utils.Timestamp_str.t;
+  body : string;
+  author : comment_user;
+}
+[@@deriving jsobject]
+
+type comments = { comments : comment array } [@@deriving jsobject]
+
+type add_comment_inner = { body : string } [@@deriving jsobject]
+
+type add_comment_payload = { comment : add_comment_inner } [@@deriving jsobject]
+
+type add_comment_response = { comment : comment } [@@deriving jsobject]

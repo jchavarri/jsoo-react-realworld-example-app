@@ -296,78 +296,66 @@ let followUser : action:Action.follow -> unit -> (Shape.author, 'a App_error.t) 
        )
        |> resolve
      )
-(*
-   let getComments :
-       slug:string -> unit -> (Shape.Comment.t array, AppError.t) result Promise.t
-       =
-    fun ~slug () ->
-     let requestInit =
-       RequestInit.make
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Articles.comments ~slug ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   json |> Shape.Comment.decode |> AppError.decode )
-            |> resolve )
 
-   let deleteComment :
-       slug:string -> id:int -> unit -> (string * int, AppError.t) result Promise.t
-       =
-    fun ~slug ~id () ->
-     let requestInit =
-       RequestInit.make ~method_:Delete
-         ~headers:(Headers.addJwtToken () |> HeadersInit.makeWithArray)
-         ()
-     in
-     Endpoints.Articles.comment ~slug ~id ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun _json -> Belt.Result.Ok (slug, id))
-            |> resolve )
+let getComments : slug:string -> unit -> (Shape.comment array, 'a App_error.t) result Promise.t =
+ fun ~slug () ->
+  let requestInit =
+    let headers = Fetch.Headers_init.make (Headers.add_jwt_token ()) in
+    Fetch.RequestInit.make ~headers ()
+  in
+  let open Promise in
+  Endpoints.Articles.comments ~slug ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.comments_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.comments) -> response.comments)
+         |> App_error.decode
+       )
+       |> resolve
+     )
 
-   let addComment :
-          slug:string
-       -> body:string
-       -> unit
-       -> (Shape.Comment.t, AppError.t) result Promise.t =
-    fun ~slug ~body () ->
-     let comment =
-       [("body", Js.Json.string body)] |> Js.Dict.fromList |> Js.Json.object_
-     in
-     let body =
-       [("comment", comment)] |> Js.Dict.fromList |> Js.Json.object_
-       |> Js.Json.stringify |> BodyInit.make
-     in
-     let requestInit =
-       RequestInit.make ~method_:Post
-         ~headers:
-           ( Headers.addJwtToken ()
-           |> Belt.Array.concat (Headers.add_content_type_as_json ())
-           |> HeadersInit.makeWithArray )
-         ~body ()
-     in
-     Endpoints.Articles.comments ~slug ()
-     |> (fun __x -> fetchWithInit __x requestInit)
-     |> then_ parseJsonIfOk |> then_ getErrorBodyText
-     |> then_ (fun result ->
-            result
-            |> Belt.Result.flatMap (fun json ->
-                   try
-                     json |> Js.Json.decodeObject |> Belt.Option.getExn
-                     |> Js.Dict.get "comment" |> Belt.Option.getExn
-                     |> Shape.Comment.decodeComment |> AppError.decode
-                   with _ ->
-                     AppError.decode
-                       (Belt.Result.Error "API.addComment: failed to decode json") )
-            |> resolve )
-*)
+let deleteComment : slug:string -> id:int -> unit -> (string * int, 'a App_error.t) result Promise.t =
+ fun ~slug ~id () ->
+  let requestInit =
+    Fetch.RequestInit.make ~method_:Delete ~headers:(Fetch.Headers_init.make (Headers.add_jwt_token ())) ()
+  in
+  let open Promise in
+  Endpoints.Articles.comment ~slug ~id ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result -> Stdlib.Result.bind result (fun _json -> Ok (slug, id)) |> resolve)
+
+let addComment : slug:string -> body:string -> unit -> (Shape.comment, 'a App_error.t) result Promise.t =
+ fun ~slug ~body () ->
+  let body =
+    Js_of_ocaml.Js._JSON##stringify (Shape.jsobject_of_add_comment_payload { comment = { body } })
+    |> Js_of_ocaml.Js.to_string
+    |> Fetch.Body_init.make
+  in
+  let requestInit =
+    Fetch.RequestInit.make ~method_:Post
+      ~headers:(Fetch.Headers_init.make (List.concat [ Headers.add_jwt_token (); Headers.add_content_type_as_json () ]))
+      ~body ()
+  in
+  let open Promise in
+  Endpoints.Articles.comments ~slug ()
+  |> (fun __x -> Fetch.fetch_withInit __x requestInit)
+  |> then_ ~fulfilled:parseJsonIfOk
+  |> then_ ~fulfilled:getErrorBodyText
+  |> then_ ~fulfilled:(fun result ->
+       Stdlib.Result.bind result (fun json ->
+         json
+         |> Shape.add_comment_response_of_jsobject
+         |> Stdlib.Result.map (fun (response : Shape.add_comment_response) -> response.comment)
+         |> App_error.decode
+       )
+       |> resolve
+     )
 
 let getProfile : username:string -> unit -> (Shape.author, 'a App_error.t) result Promise.t =
  fun ~username () ->
