@@ -72,7 +72,9 @@ let%component make ~(slug : string) ~user =
                                 ( match article with
                                 | Init | Loading -> Spinner.make ()
                                 | Reloading (Ok { body; _ }) | Complete (Ok { body; _ }) ->
-                                  div ~dangerouslySetInnerHTML:(React.Dom.makeInnerHtml ~__html:body) ()
+                                  div
+                                    ~dangerouslySetInnerHTML:(React.Dom.makeInnerHtml ~__html:(Markdown.to_html body))
+                                    ()
                                 | Reloading (Error _error) | Complete (Error _error) -> "ERROR" |> React.string
                                 );
                               ]

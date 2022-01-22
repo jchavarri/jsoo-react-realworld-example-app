@@ -8,6 +8,12 @@
  (preprocess
   (pps ppx_jsobject_conv js_of_ocaml-ppx jsoo-react.ppx)))
 
+(rule
+ (targets markdown.ml)
+ (deps markdown.mli)
+ (action
+  (run %{bin:gen_js_api} %{deps})))
+
 (alias
  (name default)
  (deps main.js))

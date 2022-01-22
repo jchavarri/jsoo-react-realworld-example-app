@@ -30,6 +30,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "dompurify": "^2.3.4",
+    "marked": "^4.0.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   }
