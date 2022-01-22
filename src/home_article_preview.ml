@@ -37,7 +37,7 @@ let%component make ~(data : Shape.article_response) ~onToggleFavorite ~isFavorit
                   [
                     i
                       ~className:(if isFavoriteBusy then "ion-load-a" else "ion-heart")
-                      ~style:(React.Dom.Style.make ~marginRight:"3px" ())
+                      ~style:React.Dom.Style.(make [| marginRight "3px" |])
                       ~children:[] ();
                     data.favoritesCount |> string_of_int |> React.string;
                   ]

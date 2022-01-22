@@ -17,7 +17,7 @@ let%component make ~(limit : int) ~(offset : int) ~(total : int) ~(onClick : int
                     ~children:
                       [
                         a ~className:"page-link"
-                          ~href:({js|#|js} ^ (page |> string_of_int))
+                          ~href:("#" ^ (page |> string_of_int))
                           ~onClick:(fun event ->
                             if Utils.isMouseRightClick event then (
                               event |> React.Event.Mouse.preventDefault;

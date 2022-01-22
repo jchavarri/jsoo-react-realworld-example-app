@@ -33,15 +33,11 @@ let%component make ~setUser =
                           | Some messages ->
                             ul ~className:"error-messages"
                               ~children:
-                                [
-                                  messages
-                                  |> List.map (fun message ->
-                                       li ~key:message
-                                         ~children:[ {js|email or password |js} ^ message |> React.string ]
-                                         ()
-                                     )
-                                  |> React.list;
-                                ]
+                                (messages
+                                |> List.map (fun message ->
+                                     li ~key:message ~children:[ "email or password " ^ message |> React.string ] ()
+                                   )
+                                )
                               ()
                           | None -> React.null
                           );

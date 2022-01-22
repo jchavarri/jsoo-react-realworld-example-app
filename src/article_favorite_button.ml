@@ -7,7 +7,7 @@ let%component make ~(data : (bool * int * string) Async_data.t) ~(onClick : Link
       | Init | Loading | Reloading (false, _, _) | Complete (false, _, _) -> "btn btn-sm btn-outline-primary"
       | Reloading (true, _, _) | Complete (true, _, _) -> "btn btn-sm btn-primary"
       )
-    ~style:(React.Dom.Style.make ~marginLeft:"5px" ())
+    ~style:React.Dom.Style.(make [| marginLeft "5px" |])
     ~onClick:
       ( match data with
       | Init | Loading | Reloading (_, _, _) -> Link.customFn ignore
@@ -17,7 +17,7 @@ let%component make ~(data : (bool * int * string) Async_data.t) ~(onClick : Link
       [
         i
           ~className:(if Async_data.isBusy data then "ion-load-a" else "ion-heart")
-          ~style:(React.Dom.Style.make ~marginRight:"5px" ())
+          ~style:React.Dom.Style.(make [| marginRight "5px" |])
           ~children:[] ();
         ( match data with
         | Init | Loading -> React.null
@@ -26,9 +26,7 @@ let%component make ~(data : (bool * int * string) Async_data.t) ~(onClick : Link
             ~children:
               [
                 (if favorited then "Unfavorite Article " else "Favorite Article ") |> React.string;
-                span ~className:"counter"
-                  ~children:[ ({js|(|js} ^ (favoritesCount |> string_of_int)) ^ {js|)|js} |> React.string ]
-                  ();
+                span ~className:"counter" ~children:[ "(" ^ (favoritesCount |> string_of_int) ^ ")" |> React.string ] ();
               ]
             ()
         );

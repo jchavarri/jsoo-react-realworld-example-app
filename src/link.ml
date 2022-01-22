@@ -48,7 +48,7 @@ let handleClick onClick event =
   );
   ignore ()
 
-let%component make ?(className = "") ?(style = React.Dom.Style.make ()) ~onClick ~children =
+let%component make ?(className = "") ?(style = React.Dom.Style.make [||]) ~onClick ~children =
   match onClick with
   | Location location ->
     let href = location |> toString in
@@ -56,6 +56,6 @@ let%component make ?(className = "") ?(style = React.Dom.Style.make ()) ~onClick
   | CustomFn _fn -> a ~style ~className ~onClick:(handleClick onClick) ~children ()
 
 module Button = struct
-  let%component make ?(className = "") ?(style = React.Dom.Style.make ()) ~onClick ?(disabled = false) ~children =
+  let%component make ?(className = "") ?(style = React.Dom.Style.make [||]) ~onClick ?(disabled = false) ~children =
     button ~className ~style ~onClick:(handleClick onClick) ~disabled ~children ()
 end

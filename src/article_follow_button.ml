@@ -16,12 +16,12 @@ let%component make ~(data : (string * bool) Async_data.t) ~(onClick : Link.onCli
       [
         i
           ~className:(if Async_data.isBusy data then "ion-load-a" else "ion-plus-round")
-          ~style:(React.Dom.Style.make ~marginRight:"5px" ())
+          ~style:React.Dom.Style.(make [| marginRight "5px" |])
           ~children:[] ();
         ( match data with
         | Init | Loading -> React.null
         | Reloading (username, following) | Complete (username, following) ->
-          ((if following then "Unfollow" else "Follow") ^ {js| |js}) ^ username |> React.string
+          ((if following then "Unfollow" else "Follow") ^ " ") ^ username |> React.string
         );
       ]
     ()

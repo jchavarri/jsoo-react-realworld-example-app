@@ -66,7 +66,7 @@ let%component make ~(slug : string) ~user =
                       ~children:
                         [
                           div
-                            ~style:(React.Dom.Style.make ~marginBottom:"2rem" ())
+                            ~style:React.Dom.Style.(make [| marginBottom "2rem" |])
                             ~children:
                               [
                                 ( match article with

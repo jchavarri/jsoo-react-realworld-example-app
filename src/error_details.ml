@@ -5,9 +5,7 @@ let%component make ~label ~error =
   |> Option.map (fun message ->
        let children =
          message
-         |> Array.map (fun message ->
-              li ~key:message ~children:[ ((label ^ {js| |js}) ^ message |> React.string) [@ns.braces] ] ()
-            )
+         |> Array.map (fun message -> li ~key:message ~children:[ label ^ " " ^ message |> React.string ] ())
          |> Array.to_list
        in
        React.Fragment.make ~children ()

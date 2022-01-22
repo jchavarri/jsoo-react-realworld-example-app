@@ -124,14 +124,17 @@ let%component make ~user =
                           | Loading -> React.null
                           | Reloading (Ok { articles; articlesCount = _ })
                           | Complete (Ok { articles; articlesCount = _ }) ->
-                            articles
-                            |> Array.map (fun item ->
-                                 Article_preview.make ~key:item.slug ~data:item ~onToggleFavorite
-                                   ~isFavoriteBusy:(toggleFavoriteBusy |> fun __x -> Hook.SS.mem item.slug __x)
-                                   ()
-                               )
-                            |> Array.to_list
-                            |> React.list
+                            React.Fragment.make
+                              ~children:
+                                (articles
+                                |> Array.map (fun item ->
+                                     Article_preview.make ~key:item.slug ~data:item ~onToggleFavorite
+                                       ~isFavoriteBusy:(toggleFavoriteBusy |> fun __x -> Hook.SS.mem item.slug __x)
+                                       ()
+                                   )
+                                |> Array.to_list
+                                )
+                              ()
                           | Reloading (Error _error) | Complete (Error _error) -> React.string "ERROR"
                           );
                           ( match feedType with

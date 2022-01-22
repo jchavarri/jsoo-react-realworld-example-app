@@ -8,7 +8,7 @@ let%component make ~data =
          ~onClick:(Link.editArticle ~slug:ok.slug |> Link.location)
          ~children:
            [
-             i ~className:"ion-edit" ~style:(React.Dom.Style.make ~marginRight:"5px" ()) ~children:[] ();
+             i ~className:"ion-edit" ~style:React.Dom.Style.(make [| marginRight "5px" |]) ~children:[] ();
              "Edit Article" |> React.string;
            ]
          ()

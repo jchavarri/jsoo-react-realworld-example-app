@@ -77,18 +77,18 @@ let%component make ~(viewMode : Shape.Profile.viewMode) ~user =
                                         ( match follow, user with
                                         | Init, (Some _ | None) ->
                                           i ~className:"ion-plus-round"
-                                            ~style:(React.Dom.Style.make ~marginRight:"3px" ())
+                                            ~style:React.Dom.Style.(make [| marginRight "3px" |])
                                             ~children:[] ()
                                         | Loading, (Some _ | None) | Reloading (_, _), _ ->
                                           i ~className:"ion-load-a"
-                                            ~style:(React.Dom.Style.make ~marginRight:"3px" ())
+                                            ~style:React.Dom.Style.(make [| marginRight "3px" |])
                                             ~children:[] ()
                                         | Complete (username, _following), user ->
                                           Option.bind user (fun (ok : Shape.user) ->
                                             if ok.username = username then
                                               Some
                                                 (i ~className:"ion-gear-a"
-                                                   ~style:(React.Dom.Style.make ~marginRight:"3px" ())
+                                                   ~style:React.Dom.Style.(make [| marginRight "3px" |])
                                                    ~children:[] ()
                                                 )
                                             else None
@@ -96,7 +96,7 @@ let%component make ~(viewMode : Shape.Profile.viewMode) ~user =
                                           |> Option.value
                                                ~default:
                                                  (i ~className:"ion-plus-round"
-                                                    ~style:(React.Dom.Style.make ~marginRight:"3px" ())
+                                                    ~style:React.Dom.Style.(make [| marginRight "3px" |])
                                                     ~children:[] ()
                                                  )
                                         );
@@ -109,9 +109,7 @@ let%component make ~(viewMode : Shape.Profile.viewMode) ~user =
                                           )
                                           |> Option.value
                                                ~default:
-                                                 ((({js| |js} ^ if following then "Unfollow" else "Follow") ^ {js| |js})
-                                                 ^ username
-                                                 )
+                                                 (" " ^ (if following then "Unfollow" else "Follow") ^ " " ^ username)
                                           |> React.string
                                         );
                                       ]
@@ -268,7 +266,7 @@ let%component make ~(viewMode : Shape.Profile.viewMode) ~user =
                                                              i
                                                                ~className:
                                                                  (if isFavoriteBusy then "ion-load-a" else "ion-heart")
-                                                               ~style:(React.Dom.Style.make ~marginRight:"3px" ())
+                                                               ~style:React.Dom.Style.(make [| marginRight "3px" |])
                                                                ~children:[] ();
                                                              article.favoritesCount |> string_of_int |> React.string;
                                                            ]

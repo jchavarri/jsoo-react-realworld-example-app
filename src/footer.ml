@@ -6,14 +6,25 @@ let%component make () =
       [
         a ~href:"https://github.com/jihchi/jsoo-react-realworld-example-app" ~target:"_blank"
           ~style:
-            (React.Dom.Style.make ~position:"fixed" ~bottom:"0" ~width:"100%"
-               ~background:"linear-gradient(#485563, #29323c)" ~textAlign:"center" ~padding:"15px"
-               ~boxShadow:"0 5px 5px 5px rgba(0,0,0,0.4)" ~zIndex:"999" ~fontSize:"1.5rem" ~display:"block"
-               ~color:"#fff" ()
+            React.Dom.Style.(
+              make
+                [|
+                  position "fixed";
+                  bottom "0";
+                  width "100%";
+                  background "linear-gradient(#485563, #29323c)";
+                  textAlign "center";
+                  padding "15px";
+                  boxShadow "0 5px 5px 5px rgba(0,0,0,0.4)";
+                  zIndex "999";
+                  fontSize "1.5rem";
+                  display "block";
+                  color "#fff";
+                |]
             )
           ~children:
             [
-              i ~className:"ion-social-github" ~style:(React.Dom.Style.make ~marginRight:"8px" ()) ~children:[] ();
+              i ~className:"ion-social-github" ~style:React.Dom.Style.(make [| marginRight "8px" |]) ~children:[] ();
               React.string "Fork on GitHub";
             ]
           ();
