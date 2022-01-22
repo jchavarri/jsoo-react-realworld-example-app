@@ -1,1 +1,0 @@
-let toHTML: string => string
