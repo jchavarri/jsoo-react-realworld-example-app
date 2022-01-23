@@ -1,21 +1,15 @@
 {
   "name": "jsoo-react-realworld-example-app",
   "version": "1.0.0",
-  "author": "Jihchi Lee <achi@987.tw>",
+  "author": "Javier Chávarri",
   "license": "MIT",
   "keywords": [
-    "ReasonML",
-    "BuckleScript",
-    "reason-react",
-    "ReScript",
-    "rescript-react",
-    "react"
+    "OCaml",
+    "js_of_ocaml",
+    "react",
+    "jsoo-react"
   ],
   "scripts": {
-    "clean": "rescript clean -with-deps",
-    "format": "npm run format:js && npm run format:res",
-    "format:js": "prettier --write \"**/*.{js,json,md,yml}\"",
-    "format:res": "rescript format -all",
     "webpack": "webpack -w",
     "webpack:production": "webpack --mode=production",
     "server": "webpack-dev-server",
