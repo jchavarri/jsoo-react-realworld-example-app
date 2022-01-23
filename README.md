@@ -41,4 +41,4 @@ Then open http://localhost:8000 to see your app.
 
 # Acknowledgements
 
-This projects was adapted from https://github.com/jihchi/rescript-react-realworld-example-app by [@jihchi](https://github.com/jihchi).
+This project was adapted from https://github.com/jihchi/rescript-react-realworld-example-app by [@jihchi](https://github.com/jihchi).
