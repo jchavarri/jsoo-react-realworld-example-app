@@ -6,7 +6,7 @@
 
 > ### Js_of_ocaml + React codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
-### [Demo](https://jsoo-react-realworld-example-app.vercel.app)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
+### [Demo](https://jchavarri.github.io/jsoo-react-realworld-example-app/)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
 
 This codebase was created to demonstrate a fully fledged fullstack application built with **[Js_of_ocaml](http://ocsigen.org/js_of_ocaml/latest/manual/overview)** and **[jsoo-react](https://github.com/ml-in-barcelona/jsoo-react)** including CRUD operations, authentication, routing, pagination, and more.
 
