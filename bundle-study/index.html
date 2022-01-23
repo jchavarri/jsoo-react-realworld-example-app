@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="A bundle size analysis comparing Js_of_ocaml and ReScript" />
+    <title>Js_of_ocaml bundle size</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        code[class*=language-],
+        pre[class*=language-] {
+            color: #ccc;
+            background: none;
+            font-family: Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace;
+            font-size: 1em;
+            text-align: left;
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+            line-height: 1.5;
+            -moz-tab-size: 4;
+            -o-tab-size: 4;
+            tab-size: 4;
+            -webkit-hyphens: none;
+            hyphens: none
+        }
+
+        pre[class*=language-] {
+            padding: 1em;
+            margin: .5em 0;
+            overflow: auto
+        }
+
+        :not(pre)>code[class*=language-],
+        pre[class*=language-] {
+            background: #2d2d2d
+        }
+
+        :not(pre)>code[class*=language-] {
+            padding: .1em;
+            border-radius: .3em;
+            white-space: normal
+        }
+
+        body,
+        html {
+            padding: 0;
+            margin: 0;
+            background-color: #fff
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 16px;
+            color: #404244;
+            margin: 0 40px;
+        }
+
+        a {
+            font-weight: 500;
+            text-decoration: none
+        }
+
+        a,
+        p a code {
+            color: #3080d0
+        }
+
+        p a code {
+            font-weight: 400
+        }
+
+        kbd {
+            background: #eee;
+            border: .15rem solid #ddd;
+            border-bottom: .25rem solid #ddd;
+            border-radius: .15rem;
+            padding: 0 .15em
+        }
+
+        blockquote {
+            font-size: 1rem;
+            color: #999;
+            border-left: .2rem solid #dfe2e5;
+            margin: 1rem 0;
+            padding: .25rem 0 .25rem 1rem
+        }
+
+        blockquote>p {
+            margin: 0
+        }
+
+        ol,
+        ul {
+            padding-left: 1.2em
+        }
+
+        strong {
+            font-weight: 600
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            line-height: 1.25
+        }
+
+        h1:focus .header-anchor,
+        h1:hover .header-anchor,
+        h2:focus .header-anchor,
+        h2:hover .header-anchor,
+        h3:focus .header-anchor,
+        h3:hover .header-anchor,
+        h4:focus .header-anchor,
+        h4:hover .header-anchor,
+        h5:focus .header-anchor,
+        h5:hover .header-anchor,
+        h6:focus .header-anchor,
+        h6:hover .header-anchor {
+            opacity: 1
+        }
+
+        h1 {
+            font-size: 2.2rem
+        }
+
+        h2 {
+            font-size: 1.65rem;
+            padding-bottom: .3rem;
+            border-bottom: 1px solid #eaecef
+        }
+
+        h3 {
+            font-size: 1.35rem
+        }
+
+        a.header-anchor {
+            font-size: .85em;
+            float: left;
+            margin-left: -.87em;
+            padding-right: .23em;
+            margin-top: .125em;
+            opacity: 0
+        }
+
+        a.header-anchor:focus,
+        a.header-anchor:hover {
+            text-decoration: none
+        }
+
+        .line-number,
+        code,
+        kbd {
+            font-family: source-code-pro, Menlo, Monaco, Consolas, Courier New, monospace
+        }
+
+        ol,
+        p,
+        ul {
+            line-height: 1.7
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eaecef
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 1rem 0;
+            display: block;
+            overflow-x: auto
+        }
+
+        tr {
+            border-top: 1px solid #dfe2e5
+        }
+
+        tr:nth-child(2n) {
+            background-color: #f6f8fa
+        }
+
+        td,
+        th {
+            border: 1px solid #dfe2e5;
+            padding: .6em 1em
+        }
+    </style>
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <h1>Js_of_ocaml bundle size study</h1>
+    <p>See <a href="https://www.javierchavarri.com/js_of_ocaml-bundle-size-study/">blog post</a> for a detailed
+        explanation.</p>
+
+    <h2>Table - Js_of_ocaml</h2>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Stat</th>
+            <th>Parsed</th>
+            <th>Gzipped</th>
+            <th>Report</th>
+        </tr>
+        <tr>
+            <td>No page components</td>
+            <td>55.15 KB</td>
+            <td>51.61 KB</td>
+            <td>17.54 KB</td>
+            <td><a href="00_no_components_jsoo_report.html">00_no_components_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Home</td>
+            <td>68.95 KB</td>
+            <td>65.14 KB</td>
+            <td>21.47 KB</td>
+            <td><a href="01_home_jsoo_report.html">01_home_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Settings</td>
+            <td>75.45 KB</td>
+            <td>71.48 KB</td>
+            <td>23.37 KB</td>
+            <td><a href="02_settings_jsoo_report.html">02_settings_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Login</td>
+            <td>77.86 KB</td>
+            <td>73.85 KB</td>
+            <td>23.96 KB</td>
+            <td><a href="03_login_jsoo_report.html">03_login_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Register</td>
+            <td>81.01 KB</td>
+            <td>77.07 KB</td>
+            <td>24.55 KB</td>
+            <td><a href="04_register_jsoo_report.html">04_register_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>CreateArticle</td>
+            <td>87.09 KB</td>
+            <td>82.97 KB</td>
+            <td>26.11 KB</td>
+            <td><a href="05_createArticle_jsoo_report.html">05_createArticle_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>EditArticle</td>
+            <td>87.17 KB</td>
+            <td>83.05 KB</td>
+            <td>26.13 KB</td>
+            <td><a href="06_editArticle_jsoo_report.html">06_editArticle_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Article</td>
+            <td>109.45 KB</td>
+            <td>104.55 KB</td>
+            <td>31.67 KB</td>
+            <td><a href="07_article_jsoo_report.html">07_article_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Profile</td>
+            <td>115.52 KB</td>
+            <td>110.29 KB</td>
+            <td>33.38 KB</td>
+            <td><a href="08_profile_jsoo_report.html">08_profile_jsoo_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Favorited</td>
+            <td>115.58 KB</td>
+            <td>110.34 KB</td>
+            <td>33.39 KB</td>
+            <td><a href="09_favorited_jsoo_report.html">09_favorited_jsoo_report.html</a></td>
+        </tr>
+    </table>
+
+    <h2>Table - ReScript</h2>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Stat</th>
+            <th>Parsed</th>
+            <th>Gzipped</th>
+            <th>Report</th>
+        </tr>
+        <tr>
+            <td>No page components</td>
+            <td>307.61 KB</td>
+            <td>11.16 KB</td>
+            <td>3.71 KB</td>
+            <td><a href="00_no_components_rescript_report.html">00_no_components_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Home</td>
+            <td>328.29 KB</td>
+            <td>23.10 KB</td>
+            <td>6.61 KB</td>
+            <td><a href="01_home_rescript_report.html">01_home_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Settings</td>
+            <td>349.47 KB</td>
+            <td>28.87 KB</td>
+            <td>7.9 KB</td>
+            <td><a href="02_settings_rescript_report.html">02_settings_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Login</td>
+            <td>359.54 KB</td>
+            <td>31.54 KB</td>
+            <td>8.27 KB</td>
+            <td><a href="03_login_rescript_report.html">03_login_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Register</td>
+            <td>372.67 KB</td>
+            <td>34.76 KB</td>
+            <td>8.53 KB</td>
+            <td><a href="04_register_rescript_report.html">04_register_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>CreateArticle</td>
+            <td>391.85 KB</td>
+            <td>40.7 KB</td>
+            <td>9.46 KB</td>
+            <td><a href="05_createArticle_rescript_report.html">05_createArticle_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>EditArticle</td>
+            <td>392.13 KB</td>
+            <td>40.79 KB</td>
+            <td>9.47 KB</td>
+            <td><a href="06_editArticle_rescript_report.html">06_editArticle_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Article</td>
+            <td>420.48 KB</td>
+            <td>53.96 KB</td>
+            <td>11.71 KB</td>
+            <td><a href="07_article_rescript_report.html">07_article_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Profile</td>
+            <td>435.64 KB</td>
+            <td>60.08 KB</td>
+            <td>12.69 KB</td>
+            <td><a href="08_profile_rescript_report.html">08_profile_rescript_report.html</a></td>
+        </tr>
+        <tr>
+            <td>Favorited</td>
+            <td>435.91 KB</td>
+            <td>60.14 KB</td>
+            <td>12.69 KB</td>
+            <td><a href="09_favorited_rescript_report.html">09_favorited_rescript_report.html</a></td>
+        </tr>
+    </table>
+
+    <h2>Chart</h2>
+    <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script>
+        const labels = [
+            'No components',
+            '+ Home',
+            '+ Settings',
+            '+ Login',
+            '+ Register',
+            '+ CreateArticle',
+            '+ EditArticle',
+            '+ Article',
+            '+ Profile',
+            '+ Favorited',
+        ];
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'js_of_ocaml (parsed, KB)',
+                backgroundColor: 'rgb(239, 122, 8)',
+                borderColor: 'rgb(239, 122, 8)',
+                data: [
+                    51.61,
+                    65.14,
+                    71.48,
+                    73.85,
+                    77.07,
+                    82.97,
+                    83.05,
+                    104.55,
+                    110.29,
+                    110.34,
+                ],
+            }, {
+                label: 'js_of_ocaml (gzipped, KB)',
+                backgroundColor: 'rgb(245,179,113)',
+                borderColor: 'rgb(245,179,113)',
+                data: [
+                    17.54,
+                    21.47,
+                    23.37,
+                    23.96,
+                    24.55,
+                    26.11,
+                    26.13,
+                    31.67,
+                    33.38,
+                    33.39,
+                ],
+            }, {
+                label: 'rescript (parsed, KB)',
+                backgroundColor: 'rgb(20, 22, 44)',
+                borderColor: 'rgb(20, 22, 44)',
+                data: [
+                    11.16,
+                    23.10,
+                    28.87,
+                    31.54,
+                    34.76,
+                    40.7,
+                    40.79,
+                    53.96,
+                    60.08,
+                    60.14,
+                ],
+            }, {
+                label: 'rescript (gzipped, KB)',
+                backgroundColor: 'rgb(81, 90, 181)',
+                borderColor: 'rgb(81, 90, 181)',
+                data: [
+                    3.71,
+                    6.61,
+                    7.9,
+                    8.27,
+                    8.53,
+                    9.46,
+                    9.47,
+                    11.71,
+                    12.69,
+                    12.69,
+                ],
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {}
+        };
+        const chart = new Chart(
+            document.getElementById('chart'),
+            config
+        );
+    </script>
+</body>
+
+</html>
