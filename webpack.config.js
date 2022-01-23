@@ -12,7 +12,7 @@ module.exports = {
   },
   output: {
     path: outputDir,
-    filename: 'Index.js'
+    filename: 'index.js'
   },
   node: {
     fs: 'empty',
@@ -21,7 +21,8 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      inject: false
+      inject: false,
+      favicon: "./src/favicon.ico"
     })
   ],
   devServer: {
