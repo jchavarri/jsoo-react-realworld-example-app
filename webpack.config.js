@@ -1,8 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const outputDir = path.join(__dirname, 'build/');
 
 const isProd = process.env.NODE_ENV === 'production';
+const withAnalyzer = process.env.ANALYZE == "true";
 
 module.exports = {
   entry: './src/main.bs.js',
@@ -22,7 +24,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/index.html',
       inject: false
-    })
+    }),
+    ...(withAnalyzer ? [new BundleAnalyzerPlugin({
+      analyzerMode: "static",
+    })] : [])
   ],
   devServer: {
     compress: true,
