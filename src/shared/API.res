@@ -252,7 +252,7 @@ let updateUser: (
   let user =
     list{
       list{("email", Js.Json.string(user.email))},
-      list{("bio", Js.Json.string(user.bio->Belt.Option.getWithDefault("")))},
+      // list{("bio", Js.Json.string(user.bio->Belt.Option.getWithDefault("")))},
       list{("image", Js.Json.string(user.image->Belt.Option.getWithDefault("")))},
       list{("username", Js.Json.string(user.username))},
       if password == "" {
