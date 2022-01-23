@@ -1,6 +1,7 @@
 project_name = jsoo-react-realworld-example
 DUNE = opam exec -- dune
 opam_file = $(project_name).opam
+current_hash = $(shell git rev-parse HEAD)
 
 .DEFAULT_GOAL := help
 
@@ -58,5 +59,11 @@ format-check: ## Checks if format is correct
 watch: ## Watch for the filesystem and rebuild on every change
 	$(DUNE) build @@default --watch
 
+.PHONY: publish
+publish: ## Publish to gh-pages
+	git checkout main && $(DUNE) build --profile=prod @@default && yarn webpack:production \
+	&& git checkout gh-pages && cp build/* . && git commit -am "$(current_hash)"
+
 $(opam_file): $(project_name).opam.template dune-project ## Update the package dependencies when new deps are added to dune-project
 	opam exec -- dune build @install        # Update the $(project_name).opam file
+

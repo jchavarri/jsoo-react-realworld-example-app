@@ -38,3 +38,7 @@ make start # bundle with Webpack, start dev web server
 ```
 
 Then open http://localhost:8000 to see your app.
+
+# Acknowledgements
+
+This projects was adapted from https://github.com/jihchi/rescript-react-realworld-example-app by [@jihchi](https://github.com/jihchi).
