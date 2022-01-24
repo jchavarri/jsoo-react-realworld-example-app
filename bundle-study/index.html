@@ -367,9 +367,7 @@
     </table>
 
     <h2>Chart</h2>
-    <div class="chart-container" style="position: relative; height:40vh; width:80vw">
-        <canvas id="chart"></canvas>
-    </div>
+    <canvas id="chart" style="position: relative; height:40vh; width:80vw"></canvas>
 
     <script>
         const labels = [
@@ -457,10 +455,13 @@
         const config = {
             type: 'line',
             data: data,
-            options: {}
         };
+        const chartElement = document.getElementById('chart');
+        if (window.innerWidth < 600) {
+            chartElement.style.height = "80vh"
+        }
         const chart = new Chart(
-            document.getElementById('chart'),
+            chartElement,
             config
         );
     </script>
