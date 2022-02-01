@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 type t = {
   username : string;

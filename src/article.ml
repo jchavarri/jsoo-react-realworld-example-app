@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make ~(slug : string) ~user =
   let articleAndTagList, _setArticle = Hook.useArticle ~slug in

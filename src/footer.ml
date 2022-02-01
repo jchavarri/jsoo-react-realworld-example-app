@@ -1,11 +1,14 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make () =
-  React.Fragment.make
-    ~children:
-      [
-        a ~href:"https://github.com/jihchi/jsoo-react-realworld-example-app" ~target:"_blank"
-          ~style:
+  fragment
+    [
+      a
+        [|
+          href "https://github.com/jihchi/jsoo-react-realworld-example-app";
+          target "_blank";
+          Prop.style
             React.Dom.Style.(
               make
                 [|
@@ -21,33 +24,27 @@ let%component make () =
                   display "block";
                   color "#fff";
                 |]
-            )
-          ~children:
+            );
+        |]
+        [
+          i [| className "ion-social-github"; Prop.style React.Dom.Style.(make [| marginRight "8px" |]) |] [];
+          React.string "Fork on GitHub";
+        ];
+      footer [||]
+        [
+          div
+            [| className "container" |]
             [
-              i ~className:"ion-social-github" ~style:React.Dom.Style.(make [| marginRight "8px" |]) ~children:[] ();
-              React.string "Fork on GitHub";
-            ]
-          ();
-        footer
-          ~children:
-            [
-              div ~className:"container"
-                ~children:
-                  [
-                    Link.make ~onClick:(Link.location Link.home) ~className:"logo-font"
-                      ~children:[ React.string "conduit" ]
-                      ();
-                    span ~className:"attribution"
-                      ~children:
-                        [
-                          React.string "An interactive learning project from ";
-                          a ~href:"https://thinkster.io" ~children:[ React.string "Thinkster" ] ();
-                          React.string ". Code &amp; design licensed under MIT.";
-                        ]
-                      ();
-                  ]
+              Link.make ~onClick:(Link.location Link.home) ~className:"logo-font"
+                ~children:[ React.string "conduit" ]
                 ();
-            ]
-          ();
-      ]
-    ()
+              span
+                [| className "attribution" |]
+                [
+                  React.string "An interactive learning project from ";
+                  a [| href "https://thinkster.io" |] [ React.string "Thinkster" ];
+                  React.string ". Code &amp; design licensed under MIT.";
+                ];
+            ];
+        ];
+    ]

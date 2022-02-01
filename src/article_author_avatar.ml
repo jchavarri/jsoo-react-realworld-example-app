@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make ~article =
   article
@@ -10,8 +11,8 @@ let%component make ~article =
          ~children:
            [
              ( match author.image with
-             | "" -> img ~children:[] ()
-             | src -> img ~src ~children:[] ()
+             | "" -> img [||] []
+             | src_ -> img [| src src_ |] []
              );
            ]
          ()

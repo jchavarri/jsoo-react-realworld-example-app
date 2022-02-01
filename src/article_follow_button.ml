@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make ~(data : (string * bool) Async_data.t) ~(onClick : Link.onClickAction) =
   Link.Button.make

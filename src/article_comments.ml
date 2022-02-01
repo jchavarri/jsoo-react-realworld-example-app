@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make ~(slug : string) ~(data : (Shape.comment array, 'a App_error.t) Async_result.t) ~user
   ~(onDeleteClick : slug:string -> id:int -> unit) ~(busy : Hook.SI.t)

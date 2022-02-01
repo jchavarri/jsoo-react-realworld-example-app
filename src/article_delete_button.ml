@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make ~isBusy ~onClick =
   Link.Button.make ~className:"btn btn-outline-danger btn-sm" ~onClick
