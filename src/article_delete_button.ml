@@ -7,9 +7,11 @@ let%component make ~isBusy ~onClick =
     ~children:
       [
         i
-          ~className:(if isBusy then "ion-load-a" else "ion-trash-a")
-          ~style:React.Dom.Style.(make [| marginRight "5px" |])
-          ~children:[] ();
+          [|
+            className (if isBusy then "ion-load-a" else "ion-trash-a");
+            Prop.style React.Dom.Style.(make [| marginRight "5px" |]);
+          |]
+          [];
         "Delete Article" |> React.string;
       ]
     ()

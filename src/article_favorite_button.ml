@@ -17,9 +17,11 @@ let%component make ~(data : (bool * int * string) Async_data.t) ~(onClick : Link
     ~children:
       [
         i
-          ~className:(if Async_data.isBusy data then "ion-load-a" else "ion-heart")
-          ~style:React.Dom.Style.(make [| marginRight "5px" |])
-          ~children:[] ();
+          [|
+            className (if Async_data.isBusy data then "ion-load-a" else "ion-heart");
+            Prop.style React.Dom.Style.(make [| marginRight "5px" |]);
+          |]
+          [];
         ( match data with
         | Init | Loading -> React.null
         | Reloading (favorited, favoritesCount, _slug) | Complete (favorited, favoritesCount, _slug) ->
@@ -27,7 +29,7 @@ let%component make ~(data : (bool * int * string) Async_data.t) ~(onClick : Link
             ~children:
               [
                 (if favorited then "Unfavorite Article " else "Favorite Article ") |> React.string;
-                span ~className:"counter" ~children:[ "(" ^ (favoritesCount |> string_of_int) ^ ")" |> React.string ] ();
+                span [| className "counter" |] [ "(" ^ (favoritesCount |> string_of_int) ^ ")" |> React.string ];
               ]
             ()
         );

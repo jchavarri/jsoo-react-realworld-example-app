@@ -48,7 +48,6 @@ let setCookieRaw : key:string -> ?value:string -> expires:string -> ?path:string
     |> Option.value ~default:""
   in
   let cookie = key ^ "=" ^ value ^ ";" ^ expires ^ path in
-  Js_of_ocaml.Js.debugger ();
   htmlDocument##.cookie := Js.string cookie
 
 let setCookie : string -> string option -> unit =
