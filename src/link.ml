@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 type location' = string
 
@@ -49,13 +50,16 @@ let handleClick onClick event =
   ignore ()
 
 let%component make ?(className = "") ?(style = React.Dom.Style.make [||]) ~onClick ~children =
-  match onClick with
-  | Location location ->
-    let href = location |> toString in
-    a ~className ~style ~href ~onClick:(handleClick onClick) ~children ()
-  | CustomFn _fn -> a ~style ~className ~onClick:(handleClick onClick) ~children ()
+  let href_ =
+    match onClick with
+    | Location location -> Some (location |> toString)
+    | CustomFn _fn -> None
+  in
+  a [| Prop.className className; Prop.style style; maybe href href_; Prop.onClick (handleClick onClick) |] children
 
 module Button = struct
   let%component make ?(className = "") ?(style = React.Dom.Style.make [||]) ~onClick ?(disabled = false) ~children =
-    button ~className ~style ~onClick:(handleClick onClick) ~disabled ~children ()
+    button
+      [| Prop.className className; Prop.style style; Prop.onClick (handleClick onClick); Prop.disabled disabled |]
+      children
 end

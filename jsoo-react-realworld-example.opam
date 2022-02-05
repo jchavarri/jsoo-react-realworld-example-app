@@ -35,6 +35,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/ml-in-barcelona/jsoo-react-template.git"
 pin-depends: [
-  [ "jsoo-react.dev" "git+https://github.com/ml-in-barcelona/jsoo-react.git#5fbcb1d" ]
+  [ "jsoo-react.dev" "git+https://github.com/ml-in-barcelona/jsoo-react.git#9e86c9f" ]
   [ "ppx_jsobject_conv.dev" "git+https://github.com/little-arhat/ppx_jsobject_conv.git#b1c43be" ]
 ]

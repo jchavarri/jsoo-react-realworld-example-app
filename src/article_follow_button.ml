@@ -1,4 +1,5 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
 let%component make ~(data : (string * bool) Async_data.t) ~(onClick : Link.onClickAction) =
   Link.Button.make
@@ -15,9 +16,11 @@ let%component make ~(data : (string * bool) Async_data.t) ~(onClick : Link.onCli
     ~children:
       [
         i
-          ~className:(if Async_data.isBusy data then "ion-load-a" else "ion-plus-round")
-          ~style:React.Dom.Style.(make [| marginRight "5px" |])
-          ~children:[] ();
+          [|
+            className (if Async_data.isBusy data then "ion-load-a" else "ion-plus-round");
+            Prop.style React.Dom.Style.(make [| marginRight "5px" |]);
+          |]
+          [];
         ( match data with
         | Init | Loading -> React.null
         | Reloading (username, following) | Complete (username, following) ->

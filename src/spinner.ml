@@ -1,6 +1,4 @@
-[@@@react.dom]
+open React.Dom.Dsl
+open Html
 
-let%component make () =
-  div ~className:"lds-ring"
-    ~children:[ div ~children:[] (); div ~children:[] (); div ~children:[] (); div ~children:[] () ]
-    ()
+let%component make () = div [| className "lds-ring" |] [ div [||] []; div [||] []; div [||] []; div [||] [] ]
